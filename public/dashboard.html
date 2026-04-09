@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Vendor Payment System</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a2e; font-size: 14px; }
+
+.topbar { background: #1a1a2e; color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.topbar h1 { font-size: 18px; font-weight: 700; }
+.topbar .meta { text-align: right; font-size: 12px; color: #a0a8c0; }
+.topbar .meta strong { color: #ffd166; font-size: 16px; display: block; }
+.top-actions { display:flex; gap:8px; align-items:center; }
+.btn-action { padding:7px 14px; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; border:none; }
+.btn-primary { background:#ffd166; color:#1a1a2e; }
+.btn-outline { background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.2); }
+.btn-outline:hover { background:rgba(255,255,255,.2); }
+.sync-pill { font-size:11px; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:5px; }
+.sync-ok  { background:rgba(46,204,113,.2); color:#2ecc71; }
+.sync-err { background:rgba(231,76,60,.2);  color:#e74c3c; }
+.sync-dot { width:7px; height:7px; border-radius:50%; background:currentColor; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 18px 16px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:750px){ .grid-2{ grid-template-columns:1fr; } }
+
+.card { background:#fff; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:18px; margin-bottom:16px; }
+.card-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; border-bottom:1px solid #f0f0f0; padding-bottom:10px; }
+.card-header h2 { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#444; }
+
+.briefing { background:linear-gradient(135deg,#1a1a2e,#16213e); color:#fff; border-radius:10px; padding:20px; margin-bottom:16px; }
+.briefing h2 { font-size:12px; text-transform:uppercase; letter-spacing:1px; color:#ffd166; margin-bottom:10px; }
+.briefing-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:14px; }
+@media(max-width:600px){ .briefing-grid{ grid-template-columns:1fr; } }
+.b-item { background:rgba(255,255,255,.08); border-radius:8px; padding:12px; }
+.b-item .lbl { font-size:10px; color:#a0a8c0; text-transform:uppercase; letter-spacing:.5px; }
+.b-item .val { font-size:20px; font-weight:700; color:#ffd166; margin:4px 0; }
+.b-item .sub { font-size:11px; color:#c0c8e0; }
+
+.alert { border-radius:8px; padding:12px 16px; margin-bottom:10px; font-size:13px; display:flex; gap:10px; }
+.a-red    { background:#fff0f0; border-left:4px solid #e74c3c; color:#c0392b; }
+.a-orange { background:#fff8f0; border-left:4px solid #e67e22; color:#d35400; }
+.a-green  { background:#f0fff8; border-left:4px solid #2ecc71; color:#27ae60; }
+
+.totals { display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+.t-pill { flex:1; min-width:155px; background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 2px 8px rgba(0,0,0,.07); }
+.t-pill.danger  { border-top:3px solid #e74c3c; }
+.t-pill.warning { border-top:3px solid #e67e22; }
+.t-pill.info    { border-top:3px solid #3498db; }
+.t-pill .tl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:#888; margin-bottom:6px; }
+.t-pill .tv { font-size:20px; font-weight:800; }
+.t-pill .ts { font-size:11px; color:#999; margin-top:3px; }
+
+.pdc-row { display:flex; align-items:flex-start; padding:10px 0; border-bottom:1px solid #f5f5f5; gap:12px; }
+.pdc-row:last-child { border-bottom:none; }
+.pdc-badge { min-width:76px; text-align:center; }
+.pdc-badge .dc { font-size:22px; font-weight:800; line-height:1; }
+.pdc-badge .dl { font-size:10px; color:#888; text-transform:uppercase; }
+.pdc-badge .ds { font-size:11px; color:#555; font-weight:600; margin-top:2px; }
+.vc { display:inline-block; font-size:11px; background:#f0f4ff; color:#3a3a7c; border-radius:4px; padding:2px 7px; margin:2px; }
+.bar-wrap { margin-top:6px; height:4px; background:#eee; border-radius:2px; }
+.bar-fill { height:4px; border-radius:2px; }
+.pdc-amt { font-size:16px; font-weight:700; white-space:nowrap; }
+.expand-btn { font-size:11px; color:#3a3a7c; cursor:pointer; border:none; background:none; font-weight:600; padding:0; margin-top:4px; }
+.collapsed { display:none; }
+.dtable { width:100%; font-size:12px; border-collapse:collapse; margin-top:8px; }
+.dtable th { text-align:left; color:#888; font-size:11px; text-transform:uppercase; padding:4px 8px; background:#f8f8f8; }
+.dtable td { padding:6px 8px; border-bottom:1px solid #f5f5f5; }
+
+.badge { display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; padding:2px 8px; border-radius:20px; }
+.b-red    { background:#ffe0e0; color:#c0392b; }
+.b-orange { background:#fff0d8; color:#d35400; }
+.b-yellow { background:#fff8d8; color:#b8860b; }
+.b-green  { background:#d8ffe8; color:#27ae60; }
+.b-blue   { background:#d8eeff; color:#2471a3; }
+.b-gray   { background:#eee;    color:#666; }
+
+.wbtn { padding:6px 12px; border-radius:20px; border:1.5px solid #ddd; background:#fff; cursor:pointer; font-size:11px; font-weight:600; line-height:1.4; transition:all .2s; }
+.wbtn:hover { border-color:#3a3a7c; }
+.wbtn.active { background:#3a3a7c; color:#fff; border-color:#3a3a7c; }
+.calc-input { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+.calc-input label { font-size:13px; color:#555; white-space:nowrap; }
+.calc-input input { flex:1; min-width:120px; border:1.5px solid #ddd; border-radius:7px; padding:8px 12px; font-size:15px; font-weight:600; outline:none; }
+.calc-input input:focus { border-color:#3a3a7c; }
+.calc-res { border-radius:8px; padding:14px; text-align:center; }
+.calc-res .rl { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#888; }
+.calc-res .rv { font-size:28px; font-weight:800; margin:4px 0; }
+.calc-res .rs { font-size:12px; }
+.short { background:#fff0f0; } .short .rv { color:#e74c3c; }
+.ok    { background:#f0fff4; } .ok    .rv { color:#2ecc71; }
+
+.sop-step { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #f5f5f5; }
+.sop-step:last-child { border-bottom:none; }
+.sop-n { width:28px; height:28px; border-radius:50%; background:#1a1a2e; color:#ffd166; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sop-c strong { display:block; font-size:13px; margin-bottom:2px; }
+.sop-c span   { font-size:12px; color:#666; line-height:1.5; }
+
+.dem-row { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #f5f5f5; gap:10px; flex-wrap:wrap; }
+.dem-row:last-child { border-bottom:none; }
+.notes-box { background:#fffde7; border:1px solid #f9e44a; border-radius:8px; padding:14px; font-size:13px; color:#5d4e00; line-height:1.7; white-space:pre-wrap; min-height:60px; }
+.notes-empty { color:#aaa; font-style:italic; }
+
+@media print {
+  .topbar,.briefing { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .no-print { display:none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>📋 Vendor Payment Dashboard</h1>
+    <div style="font-size:12px;color:#a0a8c0;margin-top:3px">Management View · Live from database · Auto-refreshes every 30s</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span class="sync-pill sync-ok" id="sync-badge"><span class="sync-dot"></span> Live</span>
+    <div class="meta"><strong id="total-label">Loading…</strong>Grand Total Liability</div>
+    <div class="top-actions no-print">
+      <button class="btn-action btn-primary" onclick="window.location.href='/login'">✏️ Data Entry</button>
+      <button class="btn-action btn-outline" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="briefing">
+    <h2>📅 Today's Briefing</h2>
+    <div style="font-size:22px;font-weight:700" id="today-disp"></div>
+    <div style="font-size:13px;color:#c0c8e0" id="dow"></div>
+    <div class="briefing-grid">
+      <div class="b-item"><div class="lbl">Next PDC Due</div><div class="val" id="next-days">—</div><div class="sub" id="next-label">—</div></div>
+      <div class="b-item"><div class="lbl">Next PDC Amount</div><div class="val" id="next-amt">—</div><div class="sub" id="next-vendors">—</div></div>
+      <div class="b-item"><div class="lbl">Urgent Demands</div><div class="val" id="dem-total-b">—</div><div class="sub" id="dem-count-b">—</div></div>
+    </div>
+  </div>
+
+  <div id="alerts"></div>
+
+  <div class="totals">
+    <div class="t-pill danger"><div class="tl">Category A — Bank PDCs</div><div class="tv" id="pdc-total">—</div><div class="ts" id="pdc-count">—</div></div>
+    <div class="t-pill warning"><div class="tl">Category B — Urgent Demands</div><div class="tv" id="dem-total">—</div><div class="ts" id="dem-count">—</div></div>
+    <div class="t-pill info"><div class="tl">Category C — Historical Unpaid</div><div class="tv" id="hist-total">—</div><div class="ts" id="hist-count">—</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-header"><span style="font-size:20px">🧮</span><h2>Cash Gap Calculator</h2></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="week-sel"></div>
+        <div class="calc-input"><label>Bank Balance (PKR):</label><input type="number" id="balance" placeholder="e.g. 200000" oninput="calcGap()"></div>
+        <div class="calc-res" id="calc-res"><div class="rl">Select a payment date above</div><div class="rv" style="color:#ccc">PKR —</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span style="font-size:20px">📝</span><h2>Today's Team Notes</h2></div>
+        <div class="notes-box notes-empty" id="notes-display">No notes added yet for today. Team can add notes in the Data Entry panel.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span style="font-size:20px">📋</span><h2>Daily SOP — Morning Routine</h2></div>
+        <div class="sop-step"><div class="sop-n">1</div><div class="sop-c"><strong>Check Bank Balance (5 min)</strong><span>Enter today's bank balance in the Cash Gap Calculator above.</span></div></div>
+        <div class="sop-step"><div class="sop-n">2</div><div class="sop-c"><strong>Review 7-Day PDCs (2 min)</strong><span>Any red badge = needs funds NOW. Calculate your daily collection target.</span></div></div>
+        <div class="sop-step"><div class="sop-n">3</div><div class="sop-c"><strong>Check Team Notes</strong><span>Read what the team logged yesterday — collections, vendor agreements, issues.</span></div></div>
+        <div class="sop-step"><div class="sop-n">4</div><div class="sop-c"><strong>Handle Vendor Demands</strong><span>Team updates statuses in Data Entry panel after each call. High priority first.</span></div></div>
+        <div class="sop-step"><div class="sop-n">5</div><div class="sop-c"><strong>New Cheque Issued?</strong><span>Team goes to Data Entry → PDC Cheques → adds the row. Dashboard updates instantly.</span></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-header"><span style="font-size:20px">🏦</span><h2>Category A — PDC Timeline</h2></div>
+        <div style="font-size:11px;color:#888;margin-bottom:12px">Bank will debit on these exact dates. Non-negotiable.</div>
+        <div id="pdc-timeline"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span style="font-size:20px">🔥</span><h2>Category B — Urgent Vendor Demands</h2></div>
+    <div style="font-size:11px;color:#888;margin-bottom:10px">Updated by team in real-time. Status changes appear here instantly.</div>
+    <div style="display:grid;grid-template-columns:1fr 110px 80px 80px;gap:6px;padding:6px 0;font-size:11px;font-weight:700;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">
+      <span>Vendor</span><span style="text-align:right">Amount</span><span style="text-align:center">Priority</span><span style="text-align:center">Status</span>
+    </div>
+    <div id="demand-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
+    <div style="margin-top:12px;padding:10px;background:#fffbf0;border-radius:8px;font-size:12px;border-left:3px solid #ffd166" id="neg-tip"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span style="font-size:20px">📜</span><h2>Category C — Historical Unpaid</h2></div>
+    <div id="hist-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
+  </div>
+
+</div>
+
+<script>
+let PDC=[], DEMANDS=[], selectedIdx=0;
+
+const fmt = n => 'PKR ' + parseFloat(n||0).toLocaleString('en-PK');
+const daysUntil = iso => { const t=new Date(); t.setHours(0,0,0,0); const d=new Date(iso+'T00:00:00'); return Math.ceil((d-t)/86400000); };
+const urgColor = d => d<0?'#bbb':d<=7?'#e74c3c':d<=14?'#e67e22':d<=21?'#f39c12':'#2ecc71';
+const urgBadge = d => {
+  if(d<0)   return {c:'b-gray',  t:'Cleared'};
+  if(d===0) return {c:'b-red',   t:'TODAY'};
+  if(d<=3)  return {c:'b-red',   t:d+'d'};
+  if(d<=7)  return {c:'b-orange',t:d+' days'};
+  if(d<=14) return {c:'b-yellow',t:d+' days'};
+  return          {c:'b-green',  t:d+' days'};
+};
+
+async function loadData() {
+  try {
+    const d = await fetch('/api/data').then(r=>r.json());
+    PDC     = d.pdcSchedule || [];
+    DEMANDS = d.demands     || [];
+    renderAll(d);
+    setSyncOk(true);
+  } catch(e) { setSyncOk(false); }
+}
+
+function setSyncOk(ok) {
+  const el=document.getElementById('sync-badge');
+  el.className='sync-pill '+(ok?'sync-ok':'sync-err');
+  el.innerHTML=`<span class="sync-dot"></span> ${ok?'Live':'Offline'}`;
+}
+
+function renderAll(d) {
+  renderBriefing();
+  renderAlerts();
+  renderTotals(d);
+  renderTimeline();
+  renderWeekSel();
+  renderDemands();
+  renderHistory(d.historical||[]);
+  renderNotes(d.notes||'');
+}
+
+function renderBriefing() {
+  const mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dn=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const t=new Date();
+  document.getElementById('today-disp').textContent=`${t.getDate()} ${mn[t.getMonth()]} ${t.getFullYear()}`;
+  document.getElementById('dow').textContent=dn[t.getDay()];
+  const up=PDC.filter(p=>daysUntil(p.isoDate)>=0);
+  if(up.length){
+    const n=up[0]; const d=daysUntil(n.isoDate);
+    document.getElementById('next-days').textContent=d===0?'TODAY!':d+' days';
+    document.getElementById('next-label').textContent=n.label;
+    document.getElementById('next-amt').textContent=fmt(n.total);
+    document.getElementById('next-vendors').textContent=n.cheques.map(c=>c.vendor).join(', ');
+  }
+  const demAmt=DEMANDS.reduce((s,d)=>s+d.amount,0);
+  document.getElementById('dem-total-b').textContent=fmt(demAmt);
+  document.getElementById('dem-count-b').textContent=`${DEMANDS.length} vendor${DEMANDS.length!==1?'s':''} requesting`;
+}
+
+function renderAlerts() {
+  let html='';
+  PDC.forEach(p=>{ const d=daysUntil(p.isoDate);
+    if(d>=0&&d<=7)   html+=`<div class="alert a-red"><span style="font-size:18px">🚨</span><div><strong>${p.label} — ${fmt(p.total)} DUE IN ${d} DAY${d!==1?'S':''}</strong> Vendors: ${p.cheques.map(c=>c.vendor).join(', ')}</div></div>`;
+    else if(d>7&&d<=14) html+=`<div class="alert a-orange"><span style="font-size:18px">⚠️</span><div><strong>${p.label} — ${fmt(p.total)} in ${d} days</strong> Start collecting: ${p.cheques.map(c=>c.vendor).join(', ')}</div></div>`;
+  });
+  if(!html){ const n=PDC.filter(p=>daysUntil(p.isoDate)>=0)[0]; html=`<div class="alert a-green"><span>✅</span><div><strong>No PDC deadlines this week.</strong> Next: ${n?.label||'None'}</div></div>`; }
+  document.getElementById('alerts').innerHTML=html;
+}
+
+function renderTotals(d) {
+  const pdcAmt=PDC.reduce((s,p)=>s+p.total,0);
+  const pdcCnt=PDC.reduce((s,p)=>s+p.cheques.length,0);
+  const demAmt=DEMANDS.reduce((s,d)=>s+d.amount,0);
+  const histAmt=(d.historical||[]).reduce((s,h)=>s+h.amount,0);
+  document.getElementById('total-label').textContent=fmt(pdcAmt+demAmt+histAmt);
+  document.getElementById('pdc-total').textContent=fmt(pdcAmt);
+  document.getElementById('pdc-count').textContent=`${pdcCnt} cheques`;
+  document.getElementById('dem-total').textContent=fmt(demAmt);
+  document.getElementById('dem-count').textContent=`${DEMANDS.length} vendors requesting`;
+  document.getElementById('hist-total').textContent=fmt(histAmt);
+  document.getElementById('hist-count').textContent=`${(d.historical||[]).length} entries`;
+}
+
+function renderTimeline() {
+  if(!PDC.length){ document.getElementById('pdc-timeline').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No cheques. Team can add from Data Entry panel.</div>'; return; }
+  const maxA=Math.max(...PDC.map(p=>p.total)); let html='';
+  PDC.forEach((p,i)=>{
+    const d=daysUntil(p.isoDate); const col=urgColor(d); const b=urgBadge(d);
+    const bw=Math.round(p.total/maxA*100); const passed=d<0;
+    html+=`<div class="pdc-row" style="opacity:${passed?.45:1}">
+      <div class="pdc-badge"><div class="dc" style="color:${col}">${passed?'✓':(d===0?'⚡':d)}</div><div class="dl">${passed?'cleared':(d===0?'DUE NOW':'days left')}</div><div class="ds">${p.label}</div></div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px"><span class="badge ${b.c}">${b.t}</span>${p.cheques.map(c=>`<span class="vc">${c.vendor}</span>`).join('')}</div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${bw}%;background:${col}"></div></div>
+        <button class="expand-btn" onclick="toggleD('dt${i}',this)">▶ Cheque details</button>
+        <div id="dt${i}" class="collapsed"><table class="dtable"><tr><th>Vendor</th><th>Cheque No</th><th style="text-align:right">Amount</th></tr>${p.cheques.map(c=>`<tr><td>${c.vendor}</td><td style="font-family:monospace">${c.cheque_no||'—'}</td><td style="text-align:right">PKR ${c.amount.toLocaleString()}</td></tr>`).join('')}</table></div>
+      </div>
+      <div class="pdc-amt" style="color:${col}">${fmt(p.total)}</div>
+    </div>`;
+  });
+  document.getElementById('pdc-timeline').innerHTML=html;
+}
+
+function renderWeekSel() {
+  const up=PDC.filter(p=>daysUntil(p.isoDate)>=0); let html='';
+  up.forEach((p,i)=>{
+    const gi=PDC.indexOf(p);
+    html+=`<button class="wbtn ${gi===selectedIdx?'active':''}" onclick="selWeek(${gi})">${p.label}<br><span style="font-size:10px;font-weight:400">${fmt(p.total)}</span></button>`;
+  });
+  document.getElementById('week-sel').innerHTML=html||'<span style="color:#aaa;font-size:12px">No upcoming payments</span>';
+}
+
+function selWeek(idx){ selectedIdx=idx; renderWeekSel(); calcGap(); }
+
+function calcGap(){
+  const bal=parseFloat(document.getElementById('balance').value)||0;
+  const p=PDC[selectedIdx]; if(!p)return;
+  const gap=p.total-bal; const d=daysUntil(p.isoDate); const el=document.getElementById('calc-res');
+  if(gap>0){
+    const pd=d>0?Math.ceil(gap/d):gap;
+    el.className='calc-res short';
+    el.innerHTML=`<div class="rl">Shortfall for ${p.label}</div><div class="rv">− ${fmt(gap)}</div><div class="rs">Collect <strong>PKR ${pd.toLocaleString()}/day</strong> over next ${d} day${d!==1?'s':''}</div>`;
+  } else {
+    el.className='calc-res ok';
+    el.innerHTML=`<div class="rl">Covered for ${p.label}</div><div class="rv">+ ${fmt(Math.abs(gap))}</div><div class="rs">PKR ${Math.abs(gap).toLocaleString()} surplus ✓</div>`;
+  }
+}
+
+function renderDemands() {
+  const sc={Urgent:'b-red',Negotiated:'b-blue',Deferred:'b-yellow',Corrected:'b-blue',Paid:'b-green'};
+  const pc={High:'b-red',Medium:'b-orange',Low:'b-gray'};
+  if(!DEMANDS.length){ document.getElementById('demand-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No demands. Add from Data Entry panel.</div>'; return; }
+  let html='';
+  DEMANDS.forEach(d=>{
+    html+=`<div class="dem-row">
+      <div style="flex:1;font-weight:600">${d.vendor}</div>
+      <div style="font-weight:700;color:#e74c3c;min-width:110px;text-align:right">PKR ${d.amount.toLocaleString()}</div>
+      <div style="text-align:center"><span class="badge ${pc[d.priority]||'b-gray'}">${d.priority}</span></div>
+      <div style="text-align:center"><span class="badge ${sc[d.status]||'b-gray'}">${d.status}</span></div>
+    </div>`;
+  });
+  document.getElementById('demand-list').innerHTML=html;
+  const high=DEMANDS.filter(d=>d.priority==='High');
+  if(high.length){
+    const total=high.reduce((s,d)=>s+d.amount,0);
+    document.getElementById('neg-tip').innerHTML=`<strong style="display:block;margin-bottom:4px">💡 Negotiation Tip</strong>${high.map(d=>d.vendor).join(' + ')} = ${fmt(total)}. Offer 20% now (≈${fmt(Math.round(total*.2))}) to buy 2 weeks.`;
+  } else { document.getElementById('neg-tip').innerHTML=''; }
+}
+
+function renderHistory(hist) {
+  if(!hist.length){ document.getElementById('hist-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No entries.</div>'; return; }
+  let html='', total=0;
+  hist.forEach(h=>{ total+=h.amount;
+    html+=`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:13px"><div style="flex:1;font-weight:600">${h.vendor}</div><div style="color:#888;min-width:90px">${h.date||'—'}</div><div style="font-weight:700;color:#e67e22">PKR ${h.amount.toLocaleString()}</div></div>`;
+  });
+  html+=`<div style="display:flex;gap:10px;padding:8px 0;font-size:13px;border-top:2px solid #eee;margin-top:4px"><div style="flex:1;font-weight:700">TOTAL</div><div style="min-width:90px"></div><div style="font-weight:700">PKR ${total.toLocaleString()}</div></div>`;
+  document.getElementById('hist-list').innerHTML=html;
+}
+
+function renderNotes(notes) {
+  const el=document.getElementById('notes-display');
+  if(notes&&notes.trim()){ el.textContent=notes; el.classList.remove('notes-empty'); }
+  else { el.textContent='No notes added yet for today. Team can add notes in the Data Entry panel.'; el.classList.add('notes-empty'); }
+}
+
+function toggleD(id,btn){
+  const el=document.getElementById(id);
+  if(el.classList.contains('collapsed')){ el.classList.remove('collapsed'); btn.textContent='▼ Hide details'; }
+  else { el.classList.add('collapsed'); btn.textContent='▶ Cheque details'; }
+}
+
+loadData();
+setInterval(loadData, 30000);
+</script>
+</body>
+</html>

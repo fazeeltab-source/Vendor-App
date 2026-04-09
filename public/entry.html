@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Entry — Vendor Payment System</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a2e; font-size: 14px; }
+
+/* NAV */
+.nav { background: #1a1a2e; color: #fff; padding: 0 24px; display: flex; align-items: center; gap: 16px; height: 56px; }
+.nav .brand { font-weight: 700; font-size: 16px; color: #ffd166; }
+.nav .brand span { color: #a0a8c0; font-weight: 400; font-size: 13px; margin-left: 6px; }
+.nav-links { display: flex; gap: 4px; margin-left: auto; }
+.nav-links a { color: #a0a8c0; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; transition: all .2s; }
+.nav-links a:hover { background: rgba(255,255,255,.1); color: #fff; }
+.user-pill { background: rgba(255,209,102,.15); color: #ffd166; font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+.logout-btn { background: none; border: 1px solid rgba(255,255,255,.2); color: #a0a8c0; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+.logout-btn:hover { border-color: #e74c3c; color: #e74c3c; }
+
+/* TABS */
+.tab-bar { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 0 24px; display: flex; gap: 2px; overflow-x: auto; }
+.tab { padding: 14px 20px; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: all .2s; }
+.tab:hover { color: #1a1a2e; }
+.tab.active { color: #1a1a2e; border-bottom-color: #ffd166; }
+
+/* LAYOUT */
+.container { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* CARD */
+.card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.07); padding: 20px; margin-bottom: 20px; }
+.card-title { font-size: 14px; font-weight: 700; color: #444; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+/* FORM */
+.form-row { display: grid; gap: 12px; margin-bottom: 14px; }
+.form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+.form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+@media(max-width:600px) { .form-row.cols-2,.form-row.cols-3,.form-row.cols-4 { grid-template-columns:1fr; } }
+.form-group label { display: block; font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+.form-group input, .form-group select {
+  width: 100%; padding: 9px 12px; border: 1.5px solid #e0e0e0;
+  border-radius: 7px; font-size: 14px; outline: none; transition: border-color .2s; background: #fff;
+}
+.form-group input:focus, .form-group select:focus { border-color: #3a3a7c; }
+.btn-submit {
+  background: #1a1a2e; color: #ffd166; border: none; border-radius: 7px;
+  padding: 10px 24px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .2s;
+}
+.btn-submit:hover { background: #2a2a4e; }
+.btn-submit:disabled { background: #aaa; cursor: not-allowed; }
+
+/* TABLE */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th { text-align: left; padding: 10px 12px; background: #f8f8f8; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
+.data-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: #fafafa; }
+.empty-row { text-align: center; color: #aaa; padding: 30px !important; }
+
+/* BADGES */
+.badge { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 20px; }
+.b-red    { background: #ffe0e0; color: #c0392b; }
+.b-orange { background: #fff0d8; color: #d35400; }
+.b-yellow { background: #fff8d8; color: #b8860b; }
+.b-green  { background: #d8ffe8; color: #27ae60; }
+.b-blue   { background: #d8eeff; color: #2471a3; }
+.b-gray   { background: #eee;    color: #666; }
+
+/* DELETE BUTTON */
+.del-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 16px; padding: 4px 8px; border-radius: 4px; transition: background .2s; }
+.del-btn:hover { background: #ffe0e0; }
+
+/* STATUS SELECT */
+select.status-sel { font-size: 11px; padding: 3px 6px; border-radius: 5px; border: 1px solid #ddd; background: #f9f9f9; cursor: pointer; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a2e; color: #ffd166; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity .3s; z-index: 999; pointer-events: none; max-width: 300px; }
+.toast.show { opacity: 1; }
+.toast.err { background: #c0392b; color: #fff; }
+
+/* NOTES */
+textarea.notes-input { width: 100%; height: 200px; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 12px; font-size: 14px; font-family: inherit; resize: vertical; outline: none; }
+textarea.notes-input:focus { border-color: #3a3a7c; }
+
+/* USERS */
+.role-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+.role-admin { background: #ffd166; color: #1a1a2e; }
+.role-staff { background: #eee; color: #666; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="brand">📋 Vendor Payment System <span>Data Entry Panel</span></div>
+  <div class="nav-links">
+    <a href="/dashboard" target="_blank">📊 View Dashboard</a>
+  </div>
+  <span class="user-pill" id="user-label">Loading…</span>
+  <button class="logout-btn" onclick="logout()">Sign Out</button>
+</div>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="showTab('pdc',this)">🏦 PDC Cheques</div>
+  <div class="tab" onclick="showTab('demands',this)">🔥 Vendor Demands</div>
+  <div class="tab" onclick="showTab('history',this)">📜 Historical Unpaid</div>
+  <div class="tab" onclick="showTab('notes',this)">📝 Daily Notes</div>
+  <div class="tab" id="users-tab" style="display:none" onclick="showTab('users',this)">👤 Users</div>
+</div>
+
+<div class="container">
+
+  <!-- ══ PDC CHEQUES ══════════════════════════════════════ -->
+  <div class="panel active" id="panel-pdc">
+    <div class="card">
+      <div class="card-title">➕ Add New PDC Cheque</div>
+      <div class="form-row cols-4">
+        <div class="form-group"><label>Date</label><input type="date" id="pdc-date" /></div>
+        <div class="form-group"><label>Vendor / Party Name</label><input type="text" id="pdc-vendor" placeholder="e.g. BONITA" /></div>
+        <div class="form-group"><label>Cheque Number</label><input type="text" id="pdc-cheque" placeholder="e.g. 10018900" /></div>
+        <div class="form-group"><label>Amount (PKR)</label><input type="number" id="pdc-amount" placeholder="e.g. 150000" /></div>
+      </div>
+      <button class="btn-submit" onclick="addPdc()">Add Cheque</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 All PDC Cheques <span id="pdc-count" style="font-size:12px;color:#888;font-weight:400;text-transform:none"></span></div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Vendor</th><th>Cheque No</th><th>Amount</th><th>Status</th><th>Added By</th><th></th></tr></thead>
+          <tbody id="pdc-table"><tr><td colspan="7" class="empty-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VENDOR DEMANDS ════════════════════════════════════ -->
+  <div class="panel" id="panel-demands">
+    <div class="card">
+      <div class="card-title">➕ Add Vendor Demand</div>
+      <div class="form-row cols-3">
+        <div class="form-group"><label>Vendor Name</label><input type="text" id="dem-vendor" placeholder="e.g. ZAM ZAM" /></div>
+        <div class="form-group"><label>Amount Demanded (PKR)</label><input type="number" id="dem-amount" placeholder="e.g. 50000" /></div>
+        <div class="form-group"><label>Priority</label>
+          <select id="dem-priority">
+            <option value="High">High — Calling daily</option>
+            <option value="Medium" selected>Medium — Occasional calls</option>
+            <option value="Low">Low — Can wait</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-submit" onclick="addDemand()">Add Demand</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔥 Active Vendor Demands</div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Vendor</th><th>Amount</th><th>Priority</th><th>Status</th><th>Updated By</th><th></th></tr></thead>
+          <tbody id="dem-table"><tr><td colspan="6" class="empty-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HISTORICAL UNPAID ══════════════════════════════════ -->
+  <div class="panel" id="panel-history">
+    <div class="card">
+      <div class="card-title">➕ Add Historical Unpaid Entry</div>
+      <div class="form-row cols-3">
+        <div class="form-group"><label>Vendor Name</label><input type="text" id="hist-vendor" placeholder="e.g. HORIZON" /></div>
+        <div class="form-group"><label>Original Date</label><input type="text" id="hist-date" placeholder="e.g. 06-04-2026" /></div>
+        <div class="form-group"><label>Amount (PKR)</label><input type="number" id="hist-amount" placeholder="e.g. 45000" /></div>
+      </div>
+      <button class="btn-submit" onclick="addHistory()">Add Entry</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📜 Historical Unpaid List</div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Vendor</th><th>Date</th><th>Amount</th><th>Added By</th><th></th></tr></thead>
+          <tbody id="hist-table"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DAILY NOTES ════════════════════════════════════════ -->
+  <div class="panel" id="panel-notes">
+    <div class="card">
+      <div class="card-title">📝 Today's Team Notes <span id="notes-date" style="font-size:12px;color:#888;font-weight:400;text-transform:none"></span></div>
+      <p style="font-size:12px;color:#888;margin-bottom:12px">Write anything your team needs to know today — collections, vendor calls, bank balance, agreements made. Everyone on the dashboard sees this.</p>
+      <textarea class="notes-input" id="notes-text" placeholder="E.g.:&#10;- Called Zam Zam, agreed to wait till 21st April&#10;- Collected PKR 80,000 from Ali Distributors&#10;- Bank balance this morning: PKR 320,000&#10;- Bonita cheque (14 Apr) — confirm with bank if funds sufficient"></textarea>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:10px">
+        <button class="btn-submit" onclick="saveNotes()">Save Notes</button>
+        <span style="font-size:12px;color:#aaa" id="notes-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ USERS (admin only) ════════════════════════════════ -->
+  <div class="panel" id="panel-users">
+    <div class="card">
+      <div class="card-title">➕ Add New Team Member</div>
+      <div class="form-row cols-3">
+        <div class="form-group"><label>Username</label><input type="text" id="new-username" placeholder="e.g. ahmed" /></div>
+        <div class="form-group"><label>Password</label><input type="password" id="new-password" placeholder="Min 6 characters" /></div>
+        <div class="form-group"><label>Role</label>
+          <select id="new-role">
+            <option value="staff">Staff — Data entry only</option>
+            <option value="admin">Admin — Full access + manage users</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-submit" onclick="addUser()">Add User</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">👤 All Users</div>
+      <table class="data-table">
+        <thead><tr><th>Username</th><th>Role</th><th>Created</th><th>Change Password</th><th></th></tr></thead>
+        <tbody id="users-table"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔑 Change My Password</div>
+      <div class="form-row cols-2">
+        <div class="form-group"><label>New Password</label><input type="password" id="my-new-pass" placeholder="Min 6 characters" /></div>
+        <div class="form-group"><label>Confirm Password</label><input type="password" id="my-confirm-pass" placeholder="Repeat password" /></div>
+      </div>
+      <button class="btn-submit" onclick="changeMyPassword()">Update Password</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentUser = null;
+
+// ═══ INIT ════════════════════════════════════════════════
+async function init() {
+  const me = await fetch('/auth/me').then(r=>r.json());
+  if (!me.loggedIn) { window.location.href = '/login'; return; }
+  currentUser = me;
+  document.getElementById('user-label').textContent = `👤 ${me.username} (${me.role})`;
+  if (me.role === 'admin') document.getElementById('users-tab').style.display = '';
+  const today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('notes-date').textContent = `— ${today}`;
+  loadAll();
+}
+
+function loadAll() { loadPdc(); loadDemands(); loadHistory(); loadNotes(); if (currentUser?.role==='admin') loadUsers(); }
+
+// ═══ TAB SWITCHING ══════════════════════════════════════
+function showTab(name, el) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ═══ UTILS ══════════════════════════════════════════════
+const fmt = n => 'PKR ' + parseFloat(n||0).toLocaleString('en-PK');
+function toast(msg, isErr=false) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(isErr?' err':''); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+async function api(url, method='GET', body=null) {
+  const opts = { method, headers: {'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(url, opts);
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error || 'Request failed');
+  return d;
+}
+const statusColors = { Urgent:'b-red', Negotiated:'b-blue', Deferred:'b-yellow', Corrected:'b-blue', Paid:'b-green' };
+const priorityColors = { High:'b-red', Medium:'b-orange', Low:'b-gray' };
+
+// ═══ PDC CHEQUES ════════════════════════════════════════
+async function loadPdc() {
+  const data = await api('/api/pdc');
+  const tbody = document.getElementById('pdc-table');
+  document.getElementById('pdc-count').textContent = `(${data.length} cheques)`;
+  if (!data.length) { tbody.innerHTML='<tr><td colspan="7" class="empty-row">No cheques yet. Add one above.</td></tr>'; return; }
+  tbody.innerHTML = data.map(r => {
+    const d = new Date(r.date+'T00:00:00');
+    const dStr = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    const today = new Date(); today.setHours(0,0,0,0);
+    const days = Math.ceil((d-today)/86400000);
+    const dayBadge = days<0?'<span class="badge b-gray">Cleared</span>':
+                     days===0?'<span class="badge b-red">TODAY</span>':
+                     days<=7?`<span class="badge b-red">${days}d</span>`:
+                     days<=14?`<span class="badge b-orange">${days}d</span>`:
+                     `<span class="badge b-green">${days}d</span>`;
+    return `<tr>
+      <td>${dStr} ${dayBadge}</td>
+      <td><strong>${r.vendor}</strong></td>
+      <td style="font-family:monospace">${r.cheque_no||'—'}</td>
+      <td style="font-weight:700;color:#e74c3c">${fmt(r.amount)}</td>
+      <td><span class="badge ${r.status==='Pending'?'b-orange':'b-green'}">${r.status}</span></td>
+      <td style="color:#888;font-size:12px">${r.created_by||'—'}</td>
+      <td><button class="del-btn" onclick="delPdc(${r.id},'${r.vendor}')">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function addPdc() {
+  const date=document.getElementById('pdc-date').value;
+  const vendor=document.getElementById('pdc-vendor').value.trim();
+  const cheque_no=document.getElementById('pdc-cheque').value.trim();
+  const amount=document.getElementById('pdc-amount').value;
+  if (!date||!vendor||!amount) { toast('Please fill Date, Vendor, and Amount',true); return; }
+  try {
+    await api('/api/pdc','POST',{date,vendor,cheque_no,amount});
+    toast(`✅ ${vendor} — ${fmt(amount)} added`);
+    document.getElementById('pdc-vendor').value='';
+    document.getElementById('pdc-cheque').value='';
+    document.getElementById('pdc-amount').value='';
+    loadPdc();
+  } catch(e) { toast(e.message,true); }
+}
+
+async function delPdc(id, vendor) {
+  if (!confirm(`Delete cheque for ${vendor}?`)) return;
+  await api(`/api/pdc/${id}`,'DELETE');
+  toast(`Deleted ${vendor}`);
+  loadPdc();
+}
+
+// ═══ VENDOR DEMANDS ═════════════════════════════════════
+async function loadDemands() {
+  const data = await api('/api/demands');
+  const tbody = document.getElementById('dem-table');
+  if (!data.length) { tbody.innerHTML='<tr><td colspan="6" class="empty-row">No demands. Add one above.</td></tr>'; return; }
+  tbody.innerHTML = data.map(r => `<tr>
+    <td><strong>${r.vendor}</strong></td>
+    <td style="font-weight:700;color:#e74c3c">${fmt(r.amount)}</td>
+    <td><span class="badge ${priorityColors[r.priority]||'b-gray'}">${r.priority}</span></td>
+    <td>
+      <select class="status-sel" onchange="updateDemandStatus(${r.id},this.value)">
+        ${['Urgent','Negotiated','Deferred','Corrected','Paid'].map(s=>`<option value="${s}"${r.status===s?' selected':''}>${s}</option>`).join('')}
+      </select>
+    </td>
+    <td style="color:#888;font-size:12px">${r.updated_by||'—'}</td>
+    <td><button class="del-btn" onclick="delDemand(${r.id},'${r.vendor}')">🗑</button></td>
+  </tr>`).join('');
+}
+
+async function addDemand() {
+  const vendor=document.getElementById('dem-vendor').value.trim();
+  const amount=document.getElementById('dem-amount').value;
+  const priority=document.getElementById('dem-priority').value;
+  if (!vendor||!amount) { toast('Please fill Vendor and Amount',true); return; }
+  try {
+    await api('/api/demands','POST',{vendor,amount,priority});
+    toast(`✅ ${vendor} demand added`);
+    document.getElementById('dem-vendor').value='';
+    document.getElementById('dem-amount').value='';
+    loadDemands();
+  } catch(e) { toast(e.message,true); }
+}
+
+async function updateDemandStatus(id, status) {
+  await api(`/api/demands/${id}`,'PUT',{status});
+  toast(`Status updated → ${status}`);
+  loadDemands();
+}
+
+async function delDemand(id, vendor) {
+  if (!confirm(`Remove demand for ${vendor}?`)) return;
+  await api(`/api/demands/${id}`,'DELETE');
+  toast(`Removed ${vendor}`);
+  loadDemands();
+}
+
+// ═══ HISTORICAL UNPAID ══════════════════════════════════
+async function loadHistory() {
+  const data = await api('/api/history');
+  const tbody = document.getElementById('hist-table');
+  if (!data.length) { tbody.innerHTML='<tr><td colspan="5" class="empty-row">No entries. Add one above.</td></tr>'; return; }
+  tbody.innerHTML = data.map(r => `<tr>
+    <td><strong>${r.vendor}</strong></td>
+    <td>${r.date||'—'}</td>
+    <td style="font-weight:700;color:#e67e22">${fmt(r.amount)}</td>
+    <td style="color:#888;font-size:12px">${r.created_by||'—'}</td>
+    <td><button class="del-btn" onclick="delHistory(${r.id},'${r.vendor}')">🗑</button></td>
+  </tr>`).join('');
+}
+
+async function addHistory() {
+  const vendor=document.getElementById('hist-vendor').value.trim();
+  const date=document.getElementById('hist-date').value.trim();
+  const amount=document.getElementById('hist-amount').value;
+  if (!vendor||!amount) { toast('Please fill Vendor and Amount',true); return; }
+  try {
+    await api('/api/history','POST',{vendor,date,amount});
+    toast(`✅ ${vendor} entry added`);
+    document.getElementById('hist-vendor').value='';
+    document.getElementById('hist-date').value='';
+    document.getElementById('hist-amount').value='';
+    loadHistory();
+  } catch(e) { toast(e.message,true); }
+}
+
+async function delHistory(id, vendor) {
+  if (!confirm(`Remove ${vendor} from history?`)) return;
+  await api(`/api/history/${id}`,'DELETE');
+  toast(`Removed ${vendor}`);
+  loadHistory();
+}
+
+// ═══ NOTES ══════════════════════════════════════════════
+async function loadNotes() {
+  const data = await api('/api/data');
+  document.getElementById('notes-text').value = data.notes||'';
+}
+
+async function saveNotes() {
+  const notes = document.getElementById('notes-text').value;
+  try {
+    await api('/api/notes','POST',{notes});
+    document.getElementById('notes-status').textContent = '✓ Saved just now';
+    setTimeout(()=>document.getElementById('notes-status').textContent='',3000);
+  } catch(e) { toast('Could not save notes',true); }
+}
+
+// ═══ USERS ══════════════════════════════════════════════
+async function loadUsers() {
+  const data = await api('/api/users');
+  const tbody = document.getElementById('users-table');
+  tbody.innerHTML = data.map(r => `<tr>
+    <td><strong>${r.username}</strong>${r.id===currentUser?.id?' <span style="font-size:11px;color:#888">(you)</span>':''}</td>
+    <td><span class="role-badge role-${r.role}">${r.role}</span></td>
+    <td style="color:#888;font-size:12px">${new Date(r.created_at).toLocaleDateString()}</td>
+    <td>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="password" id="pw-${r.id}" placeholder="New password" style="padding:4px 8px;border:1px solid #ddd;border-radius:5px;font-size:12px;width:140px">
+        <button onclick="changePassword(${r.id})" style="font-size:11px;padding:4px 10px;background:#1a1a2e;color:#ffd166;border:none;border-radius:5px;cursor:pointer">Set</button>
+      </div>
+    </td>
+    <td>${r.id!==currentUser?.id?`<button class="del-btn" onclick="delUser(${r.id},'${r.username}')">🗑</button>`:'—'}</td>
+  </tr>`).join('');
+}
+
+async function addUser() {
+  const username=document.getElementById('new-username').value.trim();
+  const password=document.getElementById('new-password').value;
+  const role=document.getElementById('new-role').value;
+  if (!username||!password) { toast('Fill username and password',true); return; }
+  try {
+    await api('/api/users','POST',{username,password,role});
+    toast(`✅ User "${username}" created`);
+    document.getElementById('new-username').value='';
+    document.getElementById('new-password').value='';
+    loadUsers();
+  } catch(e) { toast(e.message,true); }
+}
+
+async function changePassword(id) {
+  const pw = document.getElementById(`pw-${id}`).value;
+  if (!pw||pw.length<6) { toast('Password must be at least 6 characters',true); return; }
+  try {
+    await api(`/api/users/${id}/password`,'PUT',{password:pw});
+    toast('✅ Password updated'); document.getElementById(`pw-${id}`).value='';
+  } catch(e) { toast(e.message,true); }
+}
+
+async function changeMyPassword() {
+  const pw1=document.getElementById('my-new-pass').value;
+  const pw2=document.getElementById('my-confirm-pass').value;
+  if (!pw1||pw1.length<6) { toast('Password too short (min 6)',true); return; }
+  if (pw1!==pw2) { toast("Passwords don't match",true); return; }
+  try {
+    await api(`/api/users/${currentUser.id}/password`,'PUT',{password:pw1});
+    toast('✅ Your password updated');
+    document.getElementById('my-new-pass').value='';
+    document.getElementById('my-confirm-pass').value='';
+  } catch(e) { toast(e.message,true); }
+}
+
+async function delUser(id, username) {
+  if (!confirm(`Delete user "${username}"? They will not be able to login.`)) return;
+  await api(`/api/users/${id}`,'DELETE');
+  toast(`Removed ${username}`); loadUsers();
+}
+
+async function logout() {
+  await fetch('/auth/logout',{method:'POST'});
+  window.location.href='/login';
+}
+
+init();
+</script>
+</body>
+</html>
