@@ -63,6 +63,9 @@ db.exec(`
   );
 `);
 
+// ── Add paid_at column if upgrading from older version ────
+try { db.exec('ALTER TABLE pdc_cheques ADD COLUMN paid_at TEXT'); } catch(e) {}
+
 // ── Seed default users ────────────────────────────────────
 const userCount = db.prepare('SELECT COUNT(*) as c FROM users').get();
 if (userCount.c === 0) {
@@ -181,14 +184,19 @@ app.get('/auth/me', (req, res) => {
 //  DATA API — READ (public, dashboard uses these)
 // ─────────────────────────────────────────────────────────
 app.get('/api/data', (req, res) => {
-  const cheques  = db.prepare('SELECT * FROM pdc_cheques ORDER BY date,id').all();
-  const demands  = db.prepare('SELECT * FROM vendor_demands ORDER BY id').all();
-  const history  = db.prepare('SELECT * FROM historical_unpaid ORDER BY id').all();
-  const todayNote= db.prepare("SELECT * FROM daily_notes WHERE date=date('now','localtime')").get();
+  const allCheques = db.prepare('SELECT * FROM pdc_cheques ORDER BY date,id').all();
+  const demands    = db.prepare('SELECT * FROM vendor_demands ORDER BY id').all();
+  const history    = db.prepare('SELECT * FROM historical_unpaid ORDER BY id').all();
+  const todayNote  = db.prepare("SELECT * FROM daily_notes WHERE date=date('now','localtime')").get();
 
-  // Group PDC cheques by date
+  // Only PENDING cheques go into the liability schedule
+  const pending = allCheques.filter(c => c.status !== 'Paid');
+  // Paid cheques returned separately as records
+  const paidCheques = allCheques.filter(c => c.status === 'Paid').sort((a,b) => b.paid_at?.localeCompare(a.paid_at||'') || 0);
+
+  // Group pending by date
   const grouped = {};
-  cheques.forEach(c => {
+  pending.forEach(c => {
     if (!grouped[c.date]) grouped[c.date] = [];
     grouped[c.date].push(c);
   });
@@ -207,6 +215,7 @@ app.get('/api/data', (req, res) => {
 
   res.json({
     pdcSchedule,
+    paidCheques,
     demands,
     historical: history,
     notes: todayNote?.notes || '',
@@ -232,6 +241,29 @@ app.post('/api/pdc', requireAuth, (req,res) => {
 app.delete('/api/pdc/:id', requireAuth, (req,res) => {
   db.prepare('DELETE FROM pdc_cheques WHERE id=?').run(req.params.id);
   res.json({ ok:true });
+});
+
+// Mark cheque as Paid — only allowed on or after the cheque date
+app.put('/api/pdc/:id/paid', requireAuth, (req, res) => {
+  const cheque = db.prepare('SELECT * FROM pdc_cheques WHERE id=?').get(req.params.id);
+  if (!cheque) return res.status(404).json({ error: 'Cheque not found' });
+  if (cheque.status === 'Paid') return res.status(400).json({ error: 'Already marked as Paid' });
+
+  // Date lock: compare cheque date vs today (server local date)
+  const today = new Date(); today.setHours(0,0,0,0);
+  const [y, m, d] = cheque.date.split('-').map(Number);
+  const chequeDate = new Date(y, m-1, d); chequeDate.setHours(0,0,0,0);
+
+  if (chequeDate > today) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return res.status(403).json({
+      error: `🔒 Date lock: Cannot mark as Paid before ${d} ${months[m-1]} ${y}. This button unlocks on the cheque date.`
+    });
+  }
+
+  db.prepare("UPDATE pdc_cheques SET status='Paid', paid_at=datetime('now','localtime'), created_by=? WHERE id=?")
+    .run(req.session.username, req.params.id);
+  res.json({ ok: true });
 });
 
 // Vendor Demands
