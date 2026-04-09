@@ -195,10 +195,15 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
     <div id="hist-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
   </div>
 
+  <div class="card" id="paid-card" style="display:none">
+    <div class="card-header"><span style="font-size:20px">✅</span><h2>Cleared PDC Cheques — Paid & Debited</h2><span style="font-size:11px;color:#888;margin-left:auto">Removed from liabilities · Record only</span></div>
+    <div id="paid-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
+  </div>
+
 </div>
 
 <script>
-let PDC=[], DEMANDS=[], selectedIdx=0;
+let PDC=[], DEMANDS=[], PAID=[], selectedIdx=0;
 
 const fmt = n => 'PKR ' + parseFloat(n||0).toLocaleString('en-PK');
 const daysUntil = iso => { const t=new Date(); t.setHours(0,0,0,0); const d=new Date(iso+'T00:00:00'); return Math.ceil((d-t)/86400000); };
@@ -215,8 +220,9 @@ const urgBadge = d => {
 async function loadData() {
   try {
     const d = await fetch('/api/data').then(r=>r.json());
-    PDC     = d.pdcSchedule || [];
-    DEMANDS = d.demands     || [];
+    PDC     = d.pdcSchedule  || [];
+    DEMANDS = d.demands      || [];
+    PAID    = d.paidCheques  || [];
     renderAll(d);
     setSyncOk(true);
   } catch(e) { setSyncOk(false); }
@@ -237,6 +243,7 @@ function renderAll(d) {
   renderDemands();
   renderHistory(d.historical||[]);
   renderNotes(d.notes||'');
+  renderPaidCheques(d.paidCheques||[]);
 }
 
 function renderBriefing() {
@@ -368,6 +375,28 @@ function toggleD(id,btn){
   const el=document.getElementById(id);
   if(el.classList.contains('collapsed')){ el.classList.remove('collapsed'); btn.textContent='▼ Hide details'; }
   else { el.classList.add('collapsed'); btn.textContent='▶ Cheque details'; }
+}
+
+function renderPaidCheques(paid) {
+  const card = document.getElementById('paid-card');
+  if (!paid.length) { card.style.display='none'; return; }
+  card.style.display='';
+  let html='', total=0;
+  paid.forEach(c => {
+    total += c.amount;
+    const paidOn = c.paid_at ? new Date(c.paid_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const chqDate = new Date(c.date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    html += `<div style="display:grid;grid-template-columns:1fr 100px 100px 120px;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;align-items:center">
+      <div style="font-weight:600;color:#444">${c.vendor} <span style="font-size:10px;color:#aaa;font-family:monospace">${c.cheque_no||''}</span></div>
+      <div style="color:#888;font-size:12px">Due: ${chqDate}</div>
+      <div style="color:#888;font-size:12px">Cleared: ${paidOn}</div>
+      <div style="font-weight:700;color:#27ae60;text-align:right">PKR ${c.amount.toLocaleString()}</div>
+    </div>`;
+  });
+  html += `<div style="display:flex;justify-content:flex-end;padding:10px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#27ae60">
+    Total Cleared: PKR ${total.toLocaleString()}
+  </div>`;
+  document.getElementById('paid-list').innerHTML = html;
 }
 
 loadData();

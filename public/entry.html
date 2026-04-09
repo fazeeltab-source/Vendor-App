@@ -74,6 +74,12 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 .del-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 16px; padding: 4px 8px; border-radius: 4px; transition: background .2s; }
 .del-btn:hover { background: #ffe0e0; }
 
+/* MARK PAID BUTTON */
+.paid-btn { background: #27ae60; color: #fff; border: none; border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background .2s; }
+.paid-btn:hover { background: #219150; }
+.lock-icon { font-size: 15px; cursor: help; opacity: .55; }
+.paid-record { font-size: 11px; color: #27ae60; font-weight: 700; white-space: nowrap; line-height: 1.4; }
+
 /* STATUS SELECT */
 select.status-sel { font-size: 11px; padding: 3px 6px; border-radius: 5px; border: 1px solid #ddd; background: #f9f9f9; cursor: pointer; }
 
@@ -130,8 +136,8 @@ textarea.notes-input:focus { border-color: #3a3a7c; }
       <div class="card-title">📋 All PDC Cheques <span id="pdc-count" style="font-size:12px;color:#888;font-weight:400;text-transform:none"></span></div>
       <div style="overflow-x:auto">
         <table class="data-table">
-          <thead><tr><th>Date</th><th>Vendor</th><th>Cheque No</th><th>Amount</th><th>Status</th><th>Added By</th><th></th></tr></thead>
-          <tbody id="pdc-table"><tr><td colspan="7" class="empty-row">Loading…</td></tr></tbody>
+          <thead><tr><th>Date</th><th>Vendor</th><th>Cheque No</th><th>Amount</th><th>Status</th><th>Added By</th><th>Mark Paid</th><th></th></tr></thead>
+          <tbody id="pdc-table"><tr><td colspan="8" class="empty-row">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -289,27 +295,66 @@ async function loadPdc() {
   const data = await api('/api/pdc');
   const tbody = document.getElementById('pdc-table');
   document.getElementById('pdc-count').textContent = `(${data.length} cheques)`;
-  if (!data.length) { tbody.innerHTML='<tr><td colspan="7" class="empty-row">No cheques yet. Add one above.</td></tr>'; return; }
+  if (!data.length) { tbody.innerHTML='<tr><td colspan="8" class="empty-row">No cheques yet. Add one above.</td></tr>'; return; }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+
   tbody.innerHTML = data.map(r => {
-    const d = new Date(r.date+'T00:00:00');
-    const dStr = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-    const today = new Date(); today.setHours(0,0,0,0);
-    const days = Math.ceil((d-today)/86400000);
-    const dayBadge = days<0?'<span class="badge b-gray">Cleared</span>':
-                     days===0?'<span class="badge b-red">TODAY</span>':
-                     days<=7?`<span class="badge b-red">${days}d</span>`:
-                     days<=14?`<span class="badge b-orange">${days}d</span>`:
-                     `<span class="badge b-green">${days}d</span>`;
-    return `<tr>
+    const chequeDate = new Date(r.date+'T00:00:00');
+    const dStr = chequeDate.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    const days = Math.ceil((chequeDate-today)/86400000);
+
+    // Day badge
+    const dayBadge = r.status==='Paid' ? '' :
+                     days<0  ? '<span class="badge b-gray">Overdue</span>' :
+                     days===0? '<span class="badge b-red">TODAY</span>' :
+                     days<=7 ? `<span class="badge b-red">${days}d</span>` :
+                     days<=14? `<span class="badge b-orange">${days}d</span>` :
+                               `<span class="badge b-green">${days}d</span>`;
+
+    // Status badge
+    const statusBadge = r.status==='Paid'
+      ? '<span class="badge b-green">✓ PAID</span>'
+      : '<span class="badge b-orange">PENDING</span>';
+
+    // Mark Paid button — logic:
+    //  Paid already     → show paid date, no button
+    //  Pending + today >= chequeDate → green "Mark as Paid" button
+    //  Pending + today < chequeDate  → 🔒 lock icon (date not arrived)
+    let paidCell = '';
+    if (r.status === 'Paid') {
+      const paidOn = r.paid_at ? new Date(r.paid_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '';
+      paidCell = `<div class="paid-record">✓ Cleared<br><span style="color:#aaa;font-weight:400">${paidOn}</span></div>`;
+    } else if (chequeDate <= today) {
+      paidCell = `<button class="paid-btn" onclick="markPaid(${r.id},'${r.vendor}')">✓ Mark as Paid</button>`;
+    } else {
+      const unlockStr = chequeDate.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      paidCell = `<span class="lock-icon" title="🔒 Locked until ${unlockStr}. Cannot mark as Paid before the cheque date.">🔒</span>`;
+    }
+
+    // Row style: paid rows get a lighter background
+    const rowStyle = r.status==='Paid' ? 'opacity:0.6;background:#f8fff8;' : '';
+
+    return `<tr style="${rowStyle}">
       <td>${dStr} ${dayBadge}</td>
       <td><strong>${r.vendor}</strong></td>
       <td style="font-family:monospace">${r.cheque_no||'—'}</td>
-      <td style="font-weight:700;color:#e74c3c">${fmt(r.amount)}</td>
-      <td><span class="badge ${r.status==='Pending'?'b-orange':'b-green'}">${r.status}</span></td>
+      <td style="font-weight:700;color:${r.status==='Paid'?'#27ae60':'#e74c3c'}">${fmt(r.amount)}</td>
+      <td>${statusBadge}</td>
       <td style="color:#888;font-size:12px">${r.created_by||'—'}</td>
-      <td><button class="del-btn" onclick="delPdc(${r.id},'${r.vendor}')">🗑</button></td>
+      <td>${paidCell}</td>
+      <td>${r.status!=='Paid'?`<button class="del-btn" onclick="delPdc(${r.id},'${r.vendor}')">🗑</button>`:''}</td>
     </tr>`;
   }).join('');
+}
+
+async function markPaid(id, vendor) {
+  if (!confirm(`Mark "${vendor}" cheque as PAID?\n\nThis records that the cheque was debited from the bank today. The cheque will be removed from liabilities on the dashboard.`)) return;
+  try {
+    await api(`/api/pdc/${id}/paid`, 'PUT');
+    toast(`✅ ${vendor} cheque marked as Paid`);
+    loadPdc();
+  } catch(e) { toast(e.message, true); }
 }
 
 async function addPdc() {
