@@ -12,23 +12,27 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 .topbar h1 { font-size: 18px; font-weight: 700; }
 .topbar .meta { text-align: right; font-size: 12px; color: #a0a8c0; }
 .topbar .meta strong { color: #ffd166; font-size: 16px; display: block; }
-.top-actions { display:flex; gap:8px; align-items:center; }
+.top-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 .btn-action { padding:7px 14px; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; border:none; }
 .btn-primary { background:#ffd166; color:#1a1a2e; }
 .btn-outline { background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.2); }
 .btn-outline:hover { background:rgba(255,255,255,.2); }
 .sync-pill { font-size:11px; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:5px; }
-.sync-ok  { background:rgba(46,204,113,.2); color:#2ecc71; }
-.sync-err { background:rgba(231,76,60,.2);  color:#e74c3c; }
+.sync-ok  { background:rgba(46,204,113,.2);  color:#2ecc71; }
+.sync-err { background:rgba(231,76,60,.2);   color:#e74c3c; }
 .sync-dot { width:7px; height:7px; border-radius:50%; background:currentColor; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.user-info { font-size:12px; color:#a0a8c0; display:flex; align-items:center; gap:8px; }
+.user-pill { background:rgba(255,209,102,.15); color:#ffd166; font-size:11px; padding:3px 10px; border-radius:20px; font-weight:600; }
+.logout-btn { background:none; border:1px solid rgba(255,255,255,.2); color:#a0a8c0; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:11px; }
+.logout-btn:hover { border-color:#e74c3c; color:#e74c3c; }
 
 .container { max-width: 1100px; margin: 0 auto; padding: 18px 16px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media(max-width:750px){ .grid-2{ grid-template-columns:1fr; } }
 
 .card { background:#fff; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:18px; margin-bottom:16px; }
-.card-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; border-bottom:1px solid #f0f0f0; padding-bottom:10px; }
+.card-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; border-bottom:1px solid #f0f0f0; padding-bottom:10px; flex-wrap:wrap; }
 .card-header h2 { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#444; }
 
 .briefing { background:linear-gradient(135deg,#1a1a2e,#16213e); color:#fff; border-radius:10px; padding:20px; margin-bottom:16px; }
@@ -46,12 +50,14 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 .a-green  { background:#f0fff8; border-left:4px solid #2ecc71; color:#27ae60; }
 
 .totals { display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
-.t-pill { flex:1; min-width:155px; background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 2px 8px rgba(0,0,0,.07); }
+.t-pill { flex:1; min-width:140px; background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 2px 8px rgba(0,0,0,.07); }
 .t-pill.danger  { border-top:3px solid #e74c3c; }
 .t-pill.warning { border-top:3px solid #e67e22; }
 .t-pill.info    { border-top:3px solid #3498db; }
+.t-pill.purple  { border-top:3px solid #8e44ad; }
+.t-pill.teal    { border-top:3px solid #16a085; }
 .t-pill .tl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:#888; margin-bottom:6px; }
-.t-pill .tv { font-size:20px; font-weight:800; }
+.t-pill .tv { font-size:18px; font-weight:800; }
 .t-pill .ts { font-size:11px; color:#999; margin-top:3px; }
 
 .pdc-row { display:flex; align-items:flex-start; padding:10px 0; border-bottom:1px solid #f5f5f5; gap:12px; }
@@ -77,6 +83,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 .b-green  { background:#d8ffe8; color:#27ae60; }
 .b-blue   { background:#d8eeff; color:#2471a3; }
 .b-gray   { background:#eee;    color:#666; }
+.b-purple { background:#ede0ff; color:#7d3c98; }
 
 .wbtn { padding:6px 12px; border-radius:20px; border:1.5px solid #ddd; background:#fff; cursor:pointer; font-size:11px; font-weight:600; line-height:1.4; transition:all .2s; }
 .wbtn:hover { border-color:#3a3a7c; }
@@ -114,14 +121,16 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 <div class="topbar">
   <div>
     <h1>📋 Vendor Payment Dashboard</h1>
-    <div style="font-size:12px;color:#a0a8c0;margin-top:3px">Management View · Live from database · Auto-refreshes every 30s</div>
+    <div style="font-size:12px;color:#a0a8c0;margin-top:3px">Management View · apps.derma.pk · Auto-refreshes every 30s</div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
     <span class="sync-pill sync-ok" id="sync-badge"><span class="sync-dot"></span> Live</span>
     <div class="meta"><strong id="total-label">Loading…</strong>Grand Total Liability</div>
     <div class="top-actions no-print">
-      <button class="btn-action btn-primary" onclick="window.location.href='/login'">✏️ Data Entry</button>
+      <span class="user-pill" id="user-label">—</span>
+      <button class="btn-action btn-primary" onclick="window.location.href='/entry'">✏️ Data Entry</button>
       <button class="btn-action btn-outline" onclick="window.print()">🖨️ Print</button>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
     </div>
   </div>
 </div>
@@ -142,9 +151,11 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
   <div id="alerts"></div>
 
   <div class="totals">
-    <div class="t-pill danger"><div class="tl">Category A — Bank PDCs</div><div class="tv" id="pdc-total">—</div><div class="ts" id="pdc-count">—</div></div>
-    <div class="t-pill warning"><div class="tl">Category B — Urgent Demands</div><div class="tv" id="dem-total">—</div><div class="ts" id="dem-count">—</div></div>
-    <div class="t-pill info"><div class="tl">Category C — Historical Unpaid</div><div class="tv" id="hist-total">—</div><div class="ts" id="hist-count">—</div></div>
+    <div class="t-pill danger"><div class="tl">A — Bank PDCs</div><div class="tv" id="pdc-total">—</div><div class="ts" id="pdc-count">—</div></div>
+    <div class="t-pill warning"><div class="tl">B — Urgent Demands</div><div class="tv" id="dem-total">—</div><div class="ts" id="dem-count">—</div></div>
+    <div class="t-pill info"><div class="tl">C — Cash Vendors</div><div class="tv" id="cash-total">—</div><div class="ts" id="cash-count">—</div></div>
+    <div class="t-pill purple"><div class="tl">D — Upcoming Expenses</div><div class="tv" id="exp-total">—</div><div class="ts" id="exp-count">—</div></div>
+    <div class="t-pill teal"><div class="tl">E — Pending Refunds</div><div class="tv" id="ref-total">—</div><div class="ts" id="ref-count">—</div></div>
   </div>
 
   <div class="grid-2">
@@ -158,16 +169,16 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 
       <div class="card">
         <div class="card-header"><span style="font-size:20px">📝</span><h2>Today's Team Notes</h2></div>
-        <div class="notes-box notes-empty" id="notes-display">No notes added yet for today. Team can add notes in the Data Entry panel.</div>
+        <div class="notes-box notes-empty" id="notes-display">No notes added yet for today.</div>
       </div>
 
       <div class="card">
         <div class="card-header"><span style="font-size:20px">📋</span><h2>Daily SOP — Morning Routine</h2></div>
         <div class="sop-step"><div class="sop-n">1</div><div class="sop-c"><strong>Check Bank Balance (5 min)</strong><span>Enter today's bank balance in the Cash Gap Calculator above.</span></div></div>
-        <div class="sop-step"><div class="sop-n">2</div><div class="sop-c"><strong>Review 7-Day PDCs (2 min)</strong><span>Any red badge = needs funds NOW. Calculate your daily collection target.</span></div></div>
-        <div class="sop-step"><div class="sop-n">3</div><div class="sop-c"><strong>Check Team Notes</strong><span>Read what the team logged yesterday — collections, vendor agreements, issues.</span></div></div>
-        <div class="sop-step"><div class="sop-n">4</div><div class="sop-c"><strong>Handle Vendor Demands</strong><span>Team updates statuses in Data Entry panel after each call. High priority first.</span></div></div>
-        <div class="sop-step"><div class="sop-n">5</div><div class="sop-c"><strong>New Cheque Issued?</strong><span>Team goes to Data Entry → PDC Cheques → adds the row. Dashboard updates instantly.</span></div></div>
+        <div class="sop-step"><div class="sop-n">2</div><div class="sop-c"><strong>Review 7-Day PDCs (2 min)</strong><span>Red badge = needs funds NOW. Calculate your daily collection target.</span></div></div>
+        <div class="sop-step"><div class="sop-n">3</div><div class="sop-c"><strong>Check Team Notes</strong><span>Read what team logged — collections, vendor agreements, issues.</span></div></div>
+        <div class="sop-step"><div class="sop-n">4</div><div class="sop-c"><strong>Handle Vendor Demands + Expenses</strong><span>Team updates statuses. Review upcoming expenses — mark Done once paid.</span></div></div>
+        <div class="sop-step"><div class="sop-n">5</div><div class="sop-c"><strong>Process Pending Refunds</strong><span>Check Refunds section. Mark as Paid once money is sent to customer.</span></div></div>
       </div>
     </div>
 
@@ -182,7 +193,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 
   <div class="card">
     <div class="card-header"><span style="font-size:20px">🔥</span><h2>Category B — Urgent Vendor Demands</h2></div>
-    <div style="font-size:11px;color:#888;margin-bottom:10px">Updated by team in real-time. Status changes appear here instantly.</div>
+    <div style="font-size:11px;color:#888;margin-bottom:10px">Updated by team in real-time.</div>
     <div style="display:grid;grid-template-columns:1fr 110px 80px 80px;gap:6px;padding:6px 0;font-size:11px;font-weight:700;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">
       <span>Vendor</span><span style="text-align:right">Amount</span><span style="text-align:center">Priority</span><span style="text-align:center">Status</span>
     </div>
@@ -191,13 +202,29 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
   </div>
 
   <div class="card">
-    <div class="card-header"><span style="font-size:20px">📜</span><h2>Category C — Historical Unpaid</h2></div>
-    <div id="hist-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
+    <div class="card-header"><span style="font-size:20px">💵</span><h2>Category C — Cash Vendors</h2></div>
+    <div id="cash-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span style="font-size:20px">📌</span><h2>Category D — Upcoming / Required Expenses</h2>
+      <span style="font-size:11px;color:#888;margin-left:auto">Pending items included in liability</span>
+    </div>
+    <div id="exp-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span style="font-size:20px">↩️</span><h2>Category E — Pending Customer Refunds</h2>
+      <span style="font-size:11px;color:#888;margin-left:auto">Pending refunds included in liability</span>
+    </div>
+    <div id="ref-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
   </div>
 
   <div class="card" id="paid-card" style="display:none">
-    <div class="card-header"><span style="font-size:20px">✅</span><h2>Cleared PDC Cheques — Paid & Debited</h2><span style="font-size:11px;color:#888;margin-left:auto">Removed from liabilities · Record only</span></div>
-    <div id="paid-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
+    <div class="card-header"><span style="font-size:20px">✅</span><h2>Cleared PDC Cheques — Paid &amp; Debited</h2>
+      <span style="font-size:11px;color:#888;margin-left:auto">Removed from liabilities · Record only</span>
+    </div>
+    <div id="paid-list"></div>
   </div>
 
 </div>
@@ -219,7 +246,11 @@ const urgBadge = d => {
 
 async function loadData() {
   try {
-    const d = await fetch('/api/data').then(r=>r.json());
+    const d = await fetch('/api/data').then(r => {
+      if (r.status===401) { window.location.href='/login'; return null; }
+      return r.json();
+    });
+    if (!d) return;
     PDC     = d.pdcSchedule  || [];
     DEMANDS = d.demands      || [];
     PAID    = d.paidCheques  || [];
@@ -241,9 +272,11 @@ function renderAll(d) {
   renderTimeline();
   renderWeekSel();
   renderDemands();
-  renderHistory(d.historical||[]);
-  renderNotes(d.notes||'');
+  renderCashVendors(d.cashVendors||[]);
+  renderExpenses(d.pendingExpenses||[]);
+  renderRefunds(d.pendingRefunds||[]);
   renderPaidCheques(d.paidCheques||[]);
+  renderNotes(d.notes||'');
 }
 
 function renderBriefing() {
@@ -268,7 +301,7 @@ function renderBriefing() {
 function renderAlerts() {
   let html='';
   PDC.forEach(p=>{ const d=daysUntil(p.isoDate);
-    if(d>=0&&d<=7)   html+=`<div class="alert a-red"><span style="font-size:18px">🚨</span><div><strong>${p.label} — ${fmt(p.total)} DUE IN ${d} DAY${d!==1?'S':''}</strong> Vendors: ${p.cheques.map(c=>c.vendor).join(', ')}</div></div>`;
+    if(d>=0&&d<=7)    html+=`<div class="alert a-red"><span style="font-size:18px">🚨</span><div><strong>${p.label} — ${fmt(p.total)} DUE IN ${d} DAY${d!==1?'S':''}</strong> Vendors: ${p.cheques.map(c=>c.vendor).join(', ')}</div></div>`;
     else if(d>7&&d<=14) html+=`<div class="alert a-orange"><span style="font-size:18px">⚠️</span><div><strong>${p.label} — ${fmt(p.total)} in ${d} days</strong> Start collecting: ${p.cheques.map(c=>c.vendor).join(', ')}</div></div>`;
   });
   if(!html){ const n=PDC.filter(p=>daysUntil(p.isoDate)>=0)[0]; html=`<div class="alert a-green"><span>✅</span><div><strong>No PDC deadlines this week.</strong> Next: ${n?.label||'None'}</div></div>`; }
@@ -276,21 +309,29 @@ function renderAlerts() {
 }
 
 function renderTotals(d) {
-  const pdcAmt=PDC.reduce((s,p)=>s+p.total,0);
-  const pdcCnt=PDC.reduce((s,p)=>s+p.cheques.length,0);
-  const demAmt=DEMANDS.reduce((s,d)=>s+d.amount,0);
-  const histAmt=(d.historical||[]).reduce((s,h)=>s+h.amount,0);
-  document.getElementById('total-label').textContent=fmt(pdcAmt+demAmt+histAmt);
-  document.getElementById('pdc-total').textContent=fmt(pdcAmt);
-  document.getElementById('pdc-count').textContent=`${pdcCnt} cheques`;
-  document.getElementById('dem-total').textContent=fmt(demAmt);
-  document.getElementById('dem-count').textContent=`${DEMANDS.length} vendors requesting`;
-  document.getElementById('hist-total').textContent=fmt(histAmt);
-  document.getElementById('hist-count').textContent=`${(d.historical||[]).length} entries`;
+  const pdcAmt   = PDC.reduce((s,p)=>s+p.total,0);
+  const pdcCnt   = PDC.reduce((s,p)=>s+p.cheques.length,0);
+  const demAmt   = DEMANDS.reduce((s,x)=>s+x.amount,0);
+  const cashAmt  = (d.cashVendors||[]).reduce((s,x)=>s+x.amount,0);
+  const expAmt   = (d.pendingExpenses||[]).reduce((s,x)=>s+x.amount,0);
+  const refAmt   = (d.pendingRefunds||[]).reduce((s,x)=>s+x.amount,0);
+  const grand    = pdcAmt + demAmt + cashAmt + expAmt + refAmt;
+
+  document.getElementById('total-label').textContent = fmt(grand);
+  document.getElementById('pdc-total').textContent  = fmt(pdcAmt);
+  document.getElementById('pdc-count').textContent  = `${pdcCnt} cheques`;
+  document.getElementById('dem-total').textContent  = fmt(demAmt);
+  document.getElementById('dem-count').textContent  = `${DEMANDS.length} vendors`;
+  document.getElementById('cash-total').textContent = fmt(cashAmt);
+  document.getElementById('cash-count').textContent = `${(d.cashVendors||[]).length} entries`;
+  document.getElementById('exp-total').textContent  = fmt(expAmt);
+  document.getElementById('exp-count').textContent  = `${(d.pendingExpenses||[]).length} pending`;
+  document.getElementById('ref-total').textContent  = fmt(refAmt);
+  document.getElementById('ref-count').textContent  = `${(d.pendingRefunds||[]).length} pending`;
 }
 
 function renderTimeline() {
-  if(!PDC.length){ document.getElementById('pdc-timeline').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No cheques. Team can add from Data Entry panel.</div>'; return; }
+  if(!PDC.length){ document.getElementById('pdc-timeline').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No cheques. Add from Data Entry panel.</div>'; return; }
   const maxA=Math.max(...PDC.map(p=>p.total)); let html='';
   PDC.forEach((p,i)=>{
     const d=daysUntil(p.isoDate); const col=urgColor(d); const b=urgBadge(d);
@@ -337,7 +378,7 @@ function calcGap(){
 function renderDemands() {
   const sc={Urgent:'b-red',Negotiated:'b-blue',Deferred:'b-yellow',Corrected:'b-blue',Paid:'b-green'};
   const pc={High:'b-red',Medium:'b-orange',Low:'b-gray'};
-  if(!DEMANDS.length){ document.getElementById('demand-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No demands. Add from Data Entry panel.</div>'; return; }
+  if(!DEMANDS.length){ document.getElementById('demand-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No demands. Add from Data Entry.</div>'; return; }
   let html='';
   DEMANDS.forEach(d=>{
     html+=`<div class="dem-row">
@@ -355,14 +396,65 @@ function renderDemands() {
   } else { document.getElementById('neg-tip').innerHTML=''; }
 }
 
-function renderHistory(hist) {
-  if(!hist.length){ document.getElementById('hist-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No entries.</div>'; return; }
+function renderCashVendors(cash) {
+  if(!cash.length){ document.getElementById('cash-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No cash vendor entries.</div>'; return; }
   let html='', total=0;
-  hist.forEach(h=>{ total+=h.amount;
+  cash.forEach(h=>{ total+=h.amount;
     html+=`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:13px"><div style="flex:1;font-weight:600">${h.vendor}</div><div style="color:#888;min-width:90px">${h.date||'—'}</div><div style="font-weight:700;color:#e67e22">PKR ${h.amount.toLocaleString()}</div></div>`;
   });
   html+=`<div style="display:flex;gap:10px;padding:8px 0;font-size:13px;border-top:2px solid #eee;margin-top:4px"><div style="flex:1;font-weight:700">TOTAL</div><div style="min-width:90px"></div><div style="font-weight:700">PKR ${total.toLocaleString()}</div></div>`;
-  document.getElementById('hist-list').innerHTML=html;
+  document.getElementById('cash-list').innerHTML=html;
+}
+
+function renderExpenses(expenses) {
+  if(!expenses.length){ document.getElementById('exp-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No pending expenses.</div>'; return; }
+  const catColors = {Salary:'b-red',Rent:'b-orange',Utility:'b-blue',Supplier:'b-yellow',Tax:'b-purple',General:'b-gray'};
+  let html='', total=0;
+  expenses.forEach(e=>{ total+=e.amount;
+    const dueStr = e.due_date ? new Date(e.due_date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    html+=`<div style="display:grid;grid-template-columns:1fr 80px 100px 130px;gap:8px;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:13px;align-items:center">
+      <div style="font-weight:600">${e.description}</div>
+      <div><span class="badge ${catColors[e.category]||'b-gray'}">${e.category}</span></div>
+      <div style="color:#888;font-size:12px">Due: ${dueStr}</div>
+      <div style="font-weight:700;color:#8e44ad;text-align:right">PKR ${e.amount.toLocaleString()}</div>
+    </div>`;
+  });
+  html+=`<div style="display:flex;justify-content:flex-end;padding:10px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#8e44ad">Total Pending: PKR ${total.toLocaleString()}</div>`;
+  document.getElementById('exp-list').innerHTML=html;
+}
+
+function renderRefunds(refunds) {
+  if(!refunds.length){ document.getElementById('ref-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No pending refunds.</div>'; return; }
+  let html='', total=0;
+  refunds.forEach(r=>{ total+=r.amount;
+    html+=`<div style="display:grid;grid-template-columns:130px 130px 1fr 140px;gap:8px;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:13px;align-items:center">
+      <div style="font-family:monospace;font-size:12px">${r.order_number||'—'}</div>
+      <div style="font-size:12px;color:#666">${r.customer_phone||'—'}</div>
+      <div style="font-size:12px;color:#555">${r.notes?r.notes.slice(0,40)+(r.notes.length>40?'…':''):'—'}</div>
+      <div style="font-weight:700;color:#16a085;text-align:right">PKR ${r.amount.toLocaleString()}</div>
+    </div>`;
+  });
+  html+=`<div style="display:flex;justify-content:flex-end;padding:10px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#16a085">Total Pending: PKR ${total.toLocaleString()}</div>`;
+  document.getElementById('ref-list').innerHTML=html;
+}
+
+function renderPaidCheques(paid) {
+  const card=document.getElementById('paid-card');
+  if(!paid.length){ card.style.display='none'; return; }
+  card.style.display='';
+  let html='', total=0;
+  paid.forEach(c=>{ total+=c.amount;
+    const paidOn = c.paid_at ? new Date(c.paid_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const chqDate = new Date(c.date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    html+=`<div style="display:grid;grid-template-columns:1fr 100px 100px 120px;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;align-items:center">
+      <div style="font-weight:600;color:#444">${c.vendor} <span style="font-size:10px;color:#aaa;font-family:monospace">${c.cheque_no||''}</span></div>
+      <div style="color:#888;font-size:12px">Due: ${chqDate}</div>
+      <div style="color:#888;font-size:12px">Cleared: ${paidOn}</div>
+      <div style="font-weight:700;color:#27ae60;text-align:right">PKR ${c.amount.toLocaleString()}</div>
+    </div>`;
+  });
+  html+=`<div style="display:flex;justify-content:flex-end;padding:10px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#27ae60">Total Cleared: PKR ${total.toLocaleString()}</div>`;
+  document.getElementById('paid-list').innerHTML=html;
 }
 
 function renderNotes(notes) {
@@ -377,30 +469,21 @@ function toggleD(id,btn){
   else { el.classList.add('collapsed'); btn.textContent='▶ Cheque details'; }
 }
 
-function renderPaidCheques(paid) {
-  const card = document.getElementById('paid-card');
-  if (!paid.length) { card.style.display='none'; return; }
-  card.style.display='';
-  let html='', total=0;
-  paid.forEach(c => {
-    total += c.amount;
-    const paidOn = c.paid_at ? new Date(c.paid_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-    const chqDate = new Date(c.date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-    html += `<div style="display:grid;grid-template-columns:1fr 100px 100px 120px;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;align-items:center">
-      <div style="font-weight:600;color:#444">${c.vendor} <span style="font-size:10px;color:#aaa;font-family:monospace">${c.cheque_no||''}</span></div>
-      <div style="color:#888;font-size:12px">Due: ${chqDate}</div>
-      <div style="color:#888;font-size:12px">Cleared: ${paidOn}</div>
-      <div style="font-weight:700;color:#27ae60;text-align:right">PKR ${c.amount.toLocaleString()}</div>
-    </div>`;
-  });
-  html += `<div style="display:flex;justify-content:flex-end;padding:10px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#27ae60">
-    Total Cleared: PKR ${total.toLocaleString()}
-  </div>`;
-  document.getElementById('paid-list').innerHTML = html;
+async function logout() {
+  await fetch('/auth/logout',{method:'POST'});
+  window.location.href='/login';
 }
 
-loadData();
-setInterval(loadData, 30000);
+// Init — check auth and set username pill
+async function init() {
+  const me = await fetch('/auth/me').then(r=>r.json()).catch(()=>({loggedIn:false}));
+  if (!me.loggedIn) { window.location.href='/login'; return; }
+  document.getElementById('user-label').textContent = `👤 ${me.username}`;
+  loadData();
+  setInterval(loadData, 30000);
+}
+
+init();
 </script>
 </body>
 </html>
