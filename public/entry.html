@@ -115,6 +115,22 @@ textarea.notes-input:focus { border-color: #3a3a7c; }
 .role-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
 .role-admin { background: #ffd166; color: #1a1a2e; }
 .role-staff { background: #eee; color: #666; }
+
+/* NOTE ITEMS */
+.note-item { border: 1.5px solid #e8e8f0; border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: border-color .2s; }
+.note-item:hover { border-color: #c0c0d8; }
+.note-item.note-read { opacity: .65; border-color: #e0e0e0; }
+.note-header { padding: 14px 16px 10px; cursor: pointer; user-select: none; }
+.note-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.note-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-unread { background: #e74c3c; }
+.dot-read   { background: #95a5a6; }
+.note-title { font-size: 14px; font-weight: 700; color: #1a1a2e; flex: 1; }
+.note-meta  { font-size: 11px; color: #aaa; margin-top: 4px; padding-left: 16px; }
+.expand-hint { color: #3a3a7c; font-size: 11px; font-weight: 600; margin-left: 6px; }
+.note-body { padding: 0 16px 14px; font-size: 13px; color: #444; line-height: 1.7; border-top: 1px solid #f0f0f0; padding-top: 12px; }
+.note-body.collapsed { display: none; }
+.note-actions { padding: 8px 14px 10px; display: flex; align-items: center; gap: 8px; background: #fafafa; border-top: 1px solid #f0f0f0; }
 </style>
 </head>
 <body>
@@ -122,25 +138,25 @@ textarea.notes-input:focus { border-color: #3a3a7c; }
 <div class="nav">
   <div class="brand">📋 Vendor Payment System <span>Data Entry Panel</span></div>
   <div class="nav-links">
-    <a href="/dashboard" target="_blank">📊 View Dashboard</a>
+    <a href="/dashboard">📊 View Dashboard</a>
   </div>
   <span class="user-pill" id="user-label">Loading…</span>
   <button class="logout-btn" onclick="logout()">Sign Out</button>
 </div>
 
 <div class="tab-bar">
-  <div class="tab active" onclick="showTab('pdc',this)">🏦 A: PDC Cheques</div>
-  <div class="tab" onclick="showTab('demands',this)">🔥 B: Vendor Demands</div>
-  <div class="tab" onclick="showTab('cash',this)">💵 C: Cash Vendors</div>
-  <div class="tab" onclick="showTab('expenses',this)">📌 D: Upcoming Expenses</div>
-  <div class="tab" onclick="showTab('refunds',this)">↩️ E: Refunds</div>
-  <div class="tab" onclick="showTab('notes',this)">📝 Daily Notes</div>
+  <div class="tab active" onclick="showTab('pdc',this)">🏦 PDC Cheques</div>
+  <div class="tab" onclick="showTab('demands',this)">🔥 Vendor Demands</div>
+  <div class="tab" onclick="showTab('cash',this)">💵 Cash Vendors</div>
+  <div class="tab" onclick="showTab('expenses',this)">📌 Upcoming Expenses</div>
+  <div class="tab" onclick="showTab('refunds',this)">↩️ Refunds</div>
+  <div class="tab" onclick="showTab('notes',this)">📝 Team Notes <span id="unread-badge" style="display:none;background:#e74c3c;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px">0</span></div>
   <div class="tab" id="users-tab" style="display:none" onclick="showTab('users',this)">👤 Users</div>
 </div>
 
 <div class="container">
 
-  <!-- ══ A: PDC CHEQUES ══════════════════════════════════ -->
+  <!-- ══ PDC CHEQUES ══════════════════════════════════════ -->
   <div class="panel active" id="panel-pdc">
     <div class="card">
       <div class="card-title">➕ Add New PDC Cheque</div>
@@ -163,7 +179,7 @@ textarea.notes-input:focus { border-color: #3a3a7c; }
     </div>
   </div>
 
-  <!-- ══ B: VENDOR DEMANDS ════════════════════════════════ -->
+  <!-- ══ VENDOR DEMANDS ═════════════════════════════════════ -->
   <div class="panel" id="panel-demands">
     <div class="card">
       <div class="card-title">➕ Add Vendor Demand</div>
@@ -191,7 +207,7 @@ textarea.notes-input:focus { border-color: #3a3a7c; }
     </div>
   </div>
 
-  <!-- ══ C: CASH VENDORS ══════════════════════════════════ -->
+  <!-- ══ CASH VENDORS ════════════════════════════════════════ -->
   <div class="panel" id="panel-cash">
     <div class="card">
       <div class="card-title">➕ Add Cash Vendor Entry</div>
@@ -214,7 +230,7 @@ textarea.notes-input:focus { border-color: #3a3a7c; }
     </div>
   </div>
 
-  <!-- ══ D: UPCOMING / REQUIRED EXPENSES ═════════════════ -->
+  <!-- ══ UPCOMING / REQUIRED EXPENSES ════════════════════════ -->
   <div class="panel" id="panel-expenses">
     <div class="card">
       <div class="card-title">➕ Add Upcoming / Required Expense</div>
@@ -249,7 +265,7 @@ textarea.notes-input:focus { border-color: #3a3a7c; }
     </div>
   </div>
 
-  <!-- ══ E: REFUNDS ═══════════════════════════════════════ -->
+  <!-- ══ REFUNDS ══════════════════════════════════════════════ -->
   <div class="panel" id="panel-refunds">
     <div class="card">
       <div class="card-title">➕ Add Refund Request</div>
@@ -288,16 +304,29 @@ textarea.notes-input:focus { border-color: #3a3a7c; }
     </div>
   </div>
 
-  <!-- ══ DAILY NOTES ════════════════════════════════════════ -->
+  <!-- ══ TEAM NOTES ═══════════════════════════════════════════ -->
   <div class="panel" id="panel-notes">
     <div class="card">
-      <div class="card-title">📝 Today's Team Notes <span id="notes-date" style="font-size:12px;color:#888;font-weight:400;text-transform:none"></span></div>
-      <p style="font-size:12px;color:#888;margin-bottom:12px">Write anything your team needs to know today. Everyone on the dashboard sees this.</p>
-      <textarea class="notes-input" id="notes-text" placeholder="E.g.:&#10;- Called Zam Zam, agreed to wait till 21st April&#10;- Collected PKR 80,000 from Ali Distributors&#10;- Bank balance this morning: PKR 320,000&#10;- Bonita cheque (14 Apr) — confirm with bank if funds sufficient"></textarea>
-      <div style="display:flex;align-items:center;gap:12px;margin-top:10px">
-        <button class="btn-submit" onclick="saveNotes()">Save Notes</button>
-        <span style="font-size:12px;color:#aaa" id="notes-status"></span>
+      <div class="card-title">➕ Add New Note</div>
+      <p style="font-size:12px;color:#888;margin-bottom:14px">Add notes with a clear title. Team members on the dashboard can expand and mark each note as read individually.</p>
+      <div class="form-row cols-1" style="grid-template-columns:1fr">
+        <div class="form-group"><label>Note Title / Heading</label><input type="text" id="note-title" placeholder="e.g. Bonita Cheque Confirmed — 14 Apr" /></div>
       </div>
+      <div class="form-row cols-1" style="grid-template-columns:1fr">
+        <div class="form-group">
+          <label>Details (optional)</label>
+          <textarea id="note-body" placeholder="e.g. Called Bonita accounts team. Confirmed funds are cleared. Bank balance this morning: PKR 320,000. Need to collect PKR 180,000 before 21st." style="min-height:90px"></textarea>
+        </div>
+      </div>
+      <button class="btn-submit" onclick="addNote()">📝 Post Note</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 All Notes
+        <span id="notes-count" style="font-size:12px;color:#888;font-weight:400;text-transform:none"></span>
+        <button onclick="loadNotes()" style="margin-left:auto;background:none;border:1px solid #ddd;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:#666">↻ Refresh</button>
+      </div>
+      <div id="notes-list"><div style="text-align:center;color:#aaa;padding:30px">Loading…</div></div>
     </div>
   </div>
 
@@ -348,8 +377,6 @@ async function init() {
   currentUser = me;
   document.getElementById('user-label').textContent = `👤 ${me.username} (${me.role})`;
   if (me.role === 'admin') document.getElementById('users-tab').style.display = '';
-  const today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  document.getElementById('notes-date').textContent = `— ${today}`;
   loadAll();
 }
 
@@ -666,18 +693,88 @@ async function delRefund(id) {
   await api(`/api/refunds/${id}`,'DELETE'); toast('Refund deleted'); loadRefunds();
 }
 
-// ═══ NOTES ══════════════════════════════════════════════
+// ═══ TEAM NOTES (structured) ════════════════════════════
 async function loadNotes() {
-  const data = await api('/api/data');
-  document.getElementById('notes-text').value = data.notes||'';
+  const data = await api('/api/note-entries');
+  const list = document.getElementById('notes-list');
+  const badge = document.getElementById('unread-badge');
+  const unreadCount = data.filter(n => !n.is_read).length;
+
+  document.getElementById('notes-count').textContent = `(${data.length} notes · ${unreadCount} unread)`;
+
+  if (unreadCount > 0) {
+    badge.textContent = unreadCount;
+    badge.style.display = 'inline';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  if (!data.length) {
+    list.innerHTML = '<div style="text-align:center;color:#aaa;padding:30px">No notes yet. Add one above.</div>';
+    return;
+  }
+
+  list.innerHTML = data.map(n => {
+    const isRead = !!n.is_read;
+    const dt = new Date(n.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const hasBody = n.body && n.body.trim();
+    return `<div class="note-item ${isRead?'note-read':''}" id="ni-${n.id}">
+      <div class="note-header" onclick="toggleNote(${n.id})">
+        <div class="note-title-row">
+          <span class="note-dot ${isRead?'dot-read':'dot-unread'}"></span>
+          <span class="note-title">${n.title}</span>
+          ${isRead ? '<span class="badge b-green" style="font-size:9px">Read</span>' : '<span class="badge b-orange" style="font-size:9px">New</span>'}
+        </div>
+        <div class="note-meta">By ${n.created_by||'—'} · ${dt} ${hasBody?'<span class="expand-hint">▼ Tap to expand</span>':''}</div>
+      </div>
+      ${hasBody ? `<div class="note-body collapsed" id="nb-${n.id}">${n.body.replace(/\n/g,'<br>')}</div>` : ''}
+      <div class="note-actions">
+        ${!isRead ? `<button class="paid-btn" style="font-size:11px;padding:4px 10px" onclick="markNoteRead(${n.id})">✓ Mark as Read</button>` : ''}
+        ${isRead  ? `<button class="paid-btn reopen" style="font-size:11px;padding:4px 10px" onclick="markNoteUnread(${n.id})">↩ Mark Unread</button>` : ''}
+        <button class="del-btn" onclick="delNote(${n.id})" title="Delete note">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
 }
-async function saveNotes() {
-  const notes = document.getElementById('notes-text').value;
+
+async function addNote() {
+  const title = document.getElementById('note-title').value.trim();
+  const body  = document.getElementById('note-body').value.trim();
+  if (!title) { toast('Note title is required',true); return; }
   try {
-    await api('/api/notes','POST',{notes});
-    document.getElementById('notes-status').textContent = '✓ Saved just now';
-    setTimeout(()=>document.getElementById('notes-status').textContent='',3000);
-  } catch(e) { toast('Could not save notes',true); }
+    await api('/api/note-entries','POST',{title,body});
+    toast('✅ Note posted');
+    document.getElementById('note-title').value = '';
+    document.getElementById('note-body').value  = '';
+    loadNotes();
+  } catch(e) { toast(e.message,true); }
+}
+
+async function markNoteRead(id) {
+  await api(`/api/note-entries/${id}/read`,'POST');
+  loadNotes();
+}
+
+async function markNoteUnread(id) {
+  await api(`/api/note-entries/${id}/unread`,'POST');
+  loadNotes();
+}
+
+async function delNote(id) {
+  if (!confirm('Delete this note?')) return;
+  await api(`/api/note-entries/${id}`,'DELETE');
+  toast('Note deleted');
+  loadNotes();
+}
+
+function toggleNote(id) {
+  const body = document.getElementById(`nb-${id}`);
+  if (!body) return;
+  const isCollapsed = body.classList.contains('collapsed');
+  body.classList.toggle('collapsed', !isCollapsed);
+  // Update hint
+  const hint = document.querySelector(`#ni-${id} .expand-hint`);
+  if (hint) hint.textContent = isCollapsed ? '▲ Tap to collapse' : '▼ Tap to expand';
 }
 
 // ═══ USERS ══════════════════════════════════════════════

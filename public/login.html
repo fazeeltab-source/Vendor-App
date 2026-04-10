@@ -8,86 +8,174 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, #0d1117 0%, #1a1a2e 50%, #0f3460 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
 }
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+  gap: 16px;
+}
+
+/* ── App branding at top ── */
+.app-brand {
+  text-align: center;
+  color: #fff;
+}
+.app-brand .app-icon { font-size: 40px; margin-bottom: 6px; }
+.app-brand h1 { font-size: 22px; font-weight: 800; color: #ffd166; letter-spacing: .5px; }
+.app-brand .app-domain { font-size: 13px; color: #a0a8c0; margin-top: 2px; }
+
+/* ── Version badge ── */
+.version-badge {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 20px;
+  padding: 5px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #a0c8e0;
+}
+.version-badge .vdot { width: 6px; height: 6px; border-radius: 50%; background: #2ecc71; display: inline-block; }
+.version-badge strong { color: #fff; }
+
+/* ── Login card ── */
 .card {
   background: #fff;
   border-radius: 16px;
-  padding: 40px;
+  padding: 36px 40px;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  box-shadow: 0 24px 80px rgba(0,0,0,.4);
 }
-.logo { text-align: center; margin-bottom: 28px; }
-.logo .icon { font-size: 42px; }
-.logo h1 { font-size: 20px; color: #1a1a2e; font-weight: 700; margin-top: 8px; }
-.logo p  { font-size: 13px; color: #888; margin-top: 4px; }
+.card-header { text-align: center; margin-bottom: 28px; }
+.card-header h2 { font-size: 18px; color: #1a1a2e; font-weight: 700; }
+.card-header p  { font-size: 13px; color: #888; margin-top: 5px; }
+
 .form-group { margin-bottom: 18px; }
-.form-group label { display: block; font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.form-group label { display: block; font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
 .form-group input {
   width: 100%; padding: 12px 14px; border: 1.5px solid #e0e0e0;
   border-radius: 8px; font-size: 15px; outline: none; transition: border-color .2s;
 }
-.form-group input:focus { border-color: #3a3a7c; }
+.form-group input:focus { border-color: #3a3a7c; box-shadow: 0 0 0 3px rgba(58,58,124,.1); }
 .btn {
   width: 100%; padding: 13px; background: #1a1a2e; color: #ffd166;
   border: none; border-radius: 8px; font-size: 15px; font-weight: 700;
   cursor: pointer; transition: background .2s; letter-spacing: .5px;
 }
-.btn:hover { background: #2a2a4e; }
+.btn:hover { background: #2d2d5e; }
 .btn:disabled { background: #aaa; cursor: not-allowed; }
 .error {
   background: #fff0f0; border: 1px solid #f5c6cb; color: #c0392b;
   border-radius: 8px; padding: 10px 14px; font-size: 13px;
   margin-bottom: 16px; display: none;
 }
-.links { text-align: center; margin-top: 20px; font-size: 13px; color: #888; }
-.links a { color: #3a3a7c; text-decoration: none; font-weight: 600; }
-.links a:hover { text-decoration: underline; }
-.divider { display: flex; align-items: center; gap: 10px; margin: 20px 0; }
-.divider hr { flex:1; border: none; border-top: 1px solid #eee; }
-.divider span { font-size: 12px; color: #aaa; }
+
+/* ── Developer footer ── */
+.dev-footer {
+  text-align: center;
+  color: rgba(255,255,255,.35);
+  font-size: 11px;
+  padding: 4px 0 8px;
+}
+.dev-footer .el-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,.5);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .3px;
+  text-decoration: none;
+  transition: color .2s;
+}
+.dev-footer .el-logo:hover { color: #4fc3d4; }
+.el-icon {
+  width: 22px; height: 22px;
+  background: linear-gradient(135deg, #4fc3d4, #2a8a9e);
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 900; color: #fff;
+}
+.el-text { display: flex; flex-direction: column; line-height: 1.2; }
+.el-text .el-name { color: #4fc3d4; font-size: 13px; font-weight: 800; }
+.el-text .el-tagline { font-size: 9px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: 1px; }
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="logo">
-    <div class="icon">📋</div>
+<div class="wrapper">
+
+  <!-- App name -->
+  <div class="app-brand">
+    <div class="app-icon">📋</div>
     <h1>Vendor Payment System</h1>
-    <p>Sign in to access the data entry panel</p>
+    <div class="app-domain" id="app-domain">apps.derma.pk</div>
   </div>
 
-  <div class="error" id="error-msg"></div>
-
-  <form id="login-form">
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" id="username" placeholder="Enter your username" autocomplete="username" required />
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required />
-    </div>
-    <button type="submit" class="btn" id="login-btn">Sign In</button>
-  </form>
-
-  <div class="divider"><hr><span>or</span><hr></div>
-
-  <div class="links">
-    <a href="/dashboard">📊 View Dashboard (no login needed)</a>
+  <!-- Version badge -->
+  <div class="version-badge">
+    <span class="vdot"></span>
+    Latest Version: <strong id="v-num">—</strong>
+    &nbsp;·&nbsp; Updated: <span id="v-date">—</span>
   </div>
+
+  <!-- Login form -->
+  <div class="card">
+    <div class="card-header">
+      <h2>🔐 Sign In</h2>
+      <p>Enter your credentials to access the system</p>
+    </div>
+
+    <div class="error" id="error-msg"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Enter your username" autocomplete="username" required />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn" id="login-btn">Sign In →</button>
+    </form>
+  </div>
+
+  <!-- Developer credit -->
+  <div class="dev-footer">
+    <div style="margin-bottom:6px">Developed by</div>
+    <a class="el-logo" href="https://exitlogic.io" target="_blank" rel="noopener">
+      <div class="el-icon">EL</div>
+      <div class="el-text">
+        <span class="el-name">exitlogic.io</span>
+        <span class="el-tagline">Building Digital Autonomy</span>
+      </div>
+    </a>
+  </div>
+
 </div>
 
 <script>
+// Load version info
+fetch('/api/version').then(r=>r.json()).then(v => {
+  document.getElementById('v-num').textContent  = 'v' + v.version;
+  document.getElementById('v-date').textContent = v.updated;
+  document.getElementById('app-domain').textContent = v.appName || 'apps.derma.pk';
+}).catch(()=>{});
+
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const btn = document.getElementById('login-btn');
-  const errEl = document.getElementById('error-msg');
+  const btn    = document.getElementById('login-btn');
+  const errEl  = document.getElementById('error-msg');
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
 
@@ -96,29 +184,28 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   errEl.style.display = 'none';
 
   try {
-    const res = await fetch('/auth/login', {
+    const res  = await fetch('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
     const data = await res.json();
     if (res.ok) {
-      window.location.href = '/entry';
+      window.location.href = '/';
     } else {
-      errEl.textContent = data.error || 'Login failed';
+      errEl.textContent = data.error || 'Login failed. Please check your credentials.';
       errEl.style.display = 'block';
       btn.disabled = false;
-      btn.textContent = 'Sign In';
+      btn.textContent = 'Sign In →';
     }
   } catch(err) {
-    errEl.textContent = 'Connection error. Is the server running?';
+    errEl.textContent = 'Connection error. Please try again.';
     errEl.style.display = 'block';
     btn.disabled = false;
-    btn.textContent = 'Sign In';
+    btn.textContent = 'Sign In →';
   }
 });
 
-// Auto-focus username
 document.getElementById('username').focus();
 </script>
 </body>

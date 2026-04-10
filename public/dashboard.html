@@ -8,74 +8,81 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a2e; font-size: 14px; }
 
-.topbar { background: #1a1a2e; color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-.topbar h1 { font-size: 18px; font-weight: 700; }
-.topbar .meta { text-align: right; font-size: 12px; color: #a0a8c0; }
-.topbar .meta strong { color: #ffd166; font-size: 16px; display: block; }
-.top-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-.btn-action { padding:7px 14px; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; border:none; }
-.btn-primary { background:#ffd166; color:#1a1a2e; }
-.btn-outline { background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.2); }
-.btn-outline:hover { background:rgba(255,255,255,.2); }
+/* ── TOPBAR ── */
+.topbar { background: #1a1a2e; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.topbar-left h1 { font-size: 17px; font-weight: 700; }
+.topbar-left .sub { font-size: 11px; color: #a0a8c0; margin-top: 2px; }
+.topbar-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.grand-total { text-align:right; }
+.grand-total .tl { font-size:10px; color:#a0a8c0; text-transform:uppercase; letter-spacing:.5px; }
+.grand-total .tv { font-size:18px; font-weight:800; color:#ffd166; }
 .sync-pill { font-size:11px; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:5px; }
 .sync-ok  { background:rgba(46,204,113,.2);  color:#2ecc71; }
 .sync-err { background:rgba(231,76,60,.2);   color:#e74c3c; }
-.sync-dot { width:7px; height:7px; border-radius:50%; background:currentColor; animation: pulse 2s infinite; }
+.sync-dot { width:7px; height:7px; border-radius:50%; background:currentColor; animation:pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-.user-info { font-size:12px; color:#a0a8c0; display:flex; align-items:center; gap:8px; }
 .user-pill { background:rgba(255,209,102,.15); color:#ffd166; font-size:11px; padding:3px 10px; border-radius:20px; font-weight:600; }
-.logout-btn { background:none; border:1px solid rgba(255,255,255,.2); color:#a0a8c0; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:11px; }
-.logout-btn:hover { border-color:#e74c3c; color:#e74c3c; }
+.btn-action { padding:7px 14px; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; border:none; }
+.btn-primary { background:#ffd166; color:#1a1a2e; }
+.btn-outline { background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.2); cursor:pointer; border-radius:7px; padding:6px 12px; font-size:12px; }
+.btn-outline:hover { background:rgba(255,255,255,.2); }
 
-.container { max-width: 1100px; margin: 0 auto; padding: 18px 16px; }
+/* ── LAYOUT ── */
+.container { max-width: 1100px; margin: 0 auto; padding: 16px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media(max-width:750px){ .grid-2{ grid-template-columns:1fr; } }
+@media(max-width:750px){ .grid-2 { grid-template-columns:1fr; } }
 
+/* ── CARD ── */
 .card { background:#fff; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:18px; margin-bottom:16px; }
 .card-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; border-bottom:1px solid #f0f0f0; padding-bottom:10px; flex-wrap:wrap; }
-.card-header h2 { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#444; }
+.card-header h2 { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#444; flex:1; }
 
-.briefing { background:linear-gradient(135deg,#1a1a2e,#16213e); color:#fff; border-radius:10px; padding:20px; margin-bottom:16px; }
-.briefing h2 { font-size:12px; text-transform:uppercase; letter-spacing:1px; color:#ffd166; margin-bottom:10px; }
-.briefing-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:14px; }
-@media(max-width:600px){ .briefing-grid{ grid-template-columns:1fr; } }
+/* ── BRIEFING ── */
+.briefing { background:linear-gradient(135deg,#1a1a2e,#16213e); color:#fff; border-radius:10px; padding:18px; margin-bottom:16px; }
+.briefing h2 { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#ffd166; margin-bottom:8px; }
+.briefing-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:12px; }
+@media(max-width:600px){ .briefing-grid{ grid-template-columns:1fr 1fr; } }
 .b-item { background:rgba(255,255,255,.08); border-radius:8px; padding:12px; }
 .b-item .lbl { font-size:10px; color:#a0a8c0; text-transform:uppercase; letter-spacing:.5px; }
-.b-item .val { font-size:20px; font-weight:700; color:#ffd166; margin:4px 0; }
+.b-item .val { font-size:18px; font-weight:700; color:#ffd166; margin:4px 0; }
 .b-item .sub { font-size:11px; color:#c0c8e0; }
 
-.alert { border-radius:8px; padding:12px 16px; margin-bottom:10px; font-size:13px; display:flex; gap:10px; }
+/* ── ALERTS ── */
+.alert { border-radius:8px; padding:12px 16px; margin-bottom:10px; font-size:13px; display:flex; gap:10px; align-items:flex-start; }
 .a-red    { background:#fff0f0; border-left:4px solid #e74c3c; color:#c0392b; }
 .a-orange { background:#fff8f0; border-left:4px solid #e67e22; color:#d35400; }
 .a-green  { background:#f0fff8; border-left:4px solid #2ecc71; color:#27ae60; }
 
-.totals { display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
-.t-pill { flex:1; min-width:140px; background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 2px 8px rgba(0,0,0,.07); }
+/* ── TOTALS PILLS ── */
+.totals { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.t-pill { flex:1; min-width:130px; background:#fff; border-radius:10px; padding:12px 16px; box-shadow:0 2px 8px rgba(0,0,0,.07); }
 .t-pill.danger  { border-top:3px solid #e74c3c; }
 .t-pill.warning { border-top:3px solid #e67e22; }
 .t-pill.info    { border-top:3px solid #3498db; }
 .t-pill.purple  { border-top:3px solid #8e44ad; }
 .t-pill.teal    { border-top:3px solid #16a085; }
-.t-pill .tl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:#888; margin-bottom:6px; }
-.t-pill .tv { font-size:18px; font-weight:800; }
-.t-pill .ts { font-size:11px; color:#999; margin-top:3px; }
+.t-pill .tl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:#888; margin-bottom:5px; }
+.t-pill .tv { font-size:17px; font-weight:800; }
+.t-pill .ts { font-size:11px; color:#999; margin-top:2px; }
 
+/* ── PDC TIMELINE ── */
 .pdc-row { display:flex; align-items:flex-start; padding:10px 0; border-bottom:1px solid #f5f5f5; gap:12px; }
 .pdc-row:last-child { border-bottom:none; }
-.pdc-badge { min-width:76px; text-align:center; }
-.pdc-badge .dc { font-size:22px; font-weight:800; line-height:1; }
+.pdc-badge { min-width:72px; text-align:center; }
+.pdc-badge .dc { font-size:20px; font-weight:800; line-height:1; }
 .pdc-badge .dl { font-size:10px; color:#888; text-transform:uppercase; }
 .pdc-badge .ds { font-size:11px; color:#555; font-weight:600; margin-top:2px; }
 .vc { display:inline-block; font-size:11px; background:#f0f4ff; color:#3a3a7c; border-radius:4px; padding:2px 7px; margin:2px; }
 .bar-wrap { margin-top:6px; height:4px; background:#eee; border-radius:2px; }
 .bar-fill { height:4px; border-radius:2px; }
-.pdc-amt { font-size:16px; font-weight:700; white-space:nowrap; }
+.pdc-amt { font-size:15px; font-weight:700; white-space:nowrap; }
 .expand-btn { font-size:11px; color:#3a3a7c; cursor:pointer; border:none; background:none; font-weight:600; padding:0; margin-top:4px; }
 .collapsed { display:none; }
 .dtable { width:100%; font-size:12px; border-collapse:collapse; margin-top:8px; }
 .dtable th { text-align:left; color:#888; font-size:11px; text-transform:uppercase; padding:4px 8px; background:#f8f8f8; }
 .dtable td { padding:6px 8px; border-bottom:1px solid #f5f5f5; }
 
+/* ── BADGES ── */
 .badge { display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; padding:2px 8px; border-radius:20px; }
 .b-red    { background:#ffe0e0; color:#c0392b; }
 .b-orange { background:#fff0d8; color:#d35400; }
@@ -85,7 +92,8 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 .b-gray   { background:#eee;    color:#666; }
 .b-purple { background:#ede0ff; color:#7d3c98; }
 
-.wbtn { padding:6px 12px; border-radius:20px; border:1.5px solid #ddd; background:#fff; cursor:pointer; font-size:11px; font-weight:600; line-height:1.4; transition:all .2s; }
+/* ── CASH GAP CALC ── */
+.wbtn { padding:6px 12px; border-radius:20px; border:1.5px solid #ddd; background:#fff; cursor:pointer; font-size:11px; font-weight:600; line-height:1.4; transition:all .2s; white-space:nowrap; }
 .wbtn:hover { border-color:#3a3a7c; }
 .wbtn.active { background:#3a3a7c; color:#fff; border-color:#3a3a7c; }
 .calc-input { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
@@ -94,22 +102,49 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 .calc-input input:focus { border-color:#3a3a7c; }
 .calc-res { border-radius:8px; padding:14px; text-align:center; }
 .calc-res .rl { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#888; }
-.calc-res .rv { font-size:28px; font-weight:800; margin:4px 0; }
+.calc-res .rv { font-size:26px; font-weight:800; margin:4px 0; }
 .calc-res .rs { font-size:12px; }
 .short { background:#fff0f0; } .short .rv { color:#e74c3c; }
 .ok    { background:#f0fff4; } .ok    .rv { color:#2ecc71; }
 
+/* ── NOTE CARDS ── */
+.note-card { border: 1.5px solid #e8e8f0; border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: all .2s; }
+.note-card.unread { border-color: #3a3a7c; }
+.note-card.read   { opacity: .6; border-color: #e0e0e0; }
+.note-card-header { padding: 12px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; user-select: none; }
+.note-card-header:hover { background: #fafafa; }
+.note-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-new  { background: #e74c3c; }
+.dot-read { background: #bdc3c7; }
+.note-card-title { font-weight: 700; font-size: 14px; flex: 1; color: #1a1a2e; }
+.note-card-meta  { font-size: 11px; color: #aaa; padding: 0 16px 8px 34px; }
+.note-card-body  { padding: 12px 16px 14px; border-top: 1px solid #f0f0f0; font-size: 13px; color: #444; line-height: 1.8; white-space: pre-wrap; }
+.note-card-actions { padding: 8px 14px; background: #fafafa; border-top: 1px solid #f0f0f0; display: flex; gap: 8px; align-items: center; }
+.note-mark-btn { background: #1a1a2e; color: #ffd166; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.note-mark-btn:hover { background: #2d2d5e; }
+.note-all-read { text-align:center; padding: 20px; color: #27ae60; font-size: 13px; }
+
+/* ── SOP STEPS ── */
 .sop-step { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #f5f5f5; }
 .sop-step:last-child { border-bottom:none; }
 .sop-n { width:28px; height:28px; border-radius:50%; background:#1a1a2e; color:#ffd166; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .sop-c strong { display:block; font-size:13px; margin-bottom:2px; }
 .sop-c span   { font-size:12px; color:#666; line-height:1.5; }
 
+/* ── MISC ── */
 .dem-row { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #f5f5f5; gap:10px; flex-wrap:wrap; }
 .dem-row:last-child { border-bottom:none; }
-.notes-box { background:#fffde7; border:1px solid #f9e44a; border-radius:8px; padding:14px; font-size:13px; color:#5d4e00; line-height:1.7; white-space:pre-wrap; min-height:60px; }
-.notes-empty { color:#aaa; font-style:italic; }
+.row-line { display:flex; gap:8px; padding:8px 0; border-bottom:1px solid #f5f5f5; font-size:13px; align-items:center; }
+.row-line:last-child { border-bottom: none; }
 
+@media(max-width: 600px) {
+  .topbar { flex-direction: column; align-items: flex-start; }
+  .topbar-right { width: 100%; justify-content: space-between; }
+  .totals { flex-direction: column; }
+  .t-pill { min-width: 100%; }
+  .pdc-row { flex-direction: column; }
+  .briefing-grid { grid-template-columns: 1fr; }
+}
 @media print {
   .topbar,.briefing { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   .no-print { display:none !important; }
@@ -119,18 +154,21 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 <body>
 
 <div class="topbar">
-  <div>
+  <div class="topbar-left">
     <h1>📋 Vendor Payment Dashboard</h1>
-    <div style="font-size:12px;color:#a0a8c0;margin-top:3px">Management View · apps.derma.pk · Auto-refreshes every 30s</div>
+    <div class="sub" id="top-domain">apps.derma.pk · Auto-refreshes every 30s</div>
   </div>
-  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+  <div class="topbar-right">
     <span class="sync-pill sync-ok" id="sync-badge"><span class="sync-dot"></span> Live</span>
-    <div class="meta"><strong id="total-label">Loading…</strong>Grand Total Liability</div>
-    <div class="top-actions no-print">
+    <div class="grand-total">
+      <div class="tl">Grand Total Liability</div>
+      <div class="tv" id="total-label">Loading…</div>
+    </div>
+    <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       <span class="user-pill" id="user-label">—</span>
       <button class="btn-action btn-primary" onclick="window.location.href='/entry'">✏️ Data Entry</button>
-      <button class="btn-action btn-outline" onclick="window.print()">🖨️ Print</button>
-      <button class="logout-btn" onclick="logout()">Sign Out</button>
+      <button class="btn-outline" onclick="window.print()">🖨️</button>
+      <button class="btn-outline" onclick="logout()" title="Sign Out">⏻</button>
     </div>
   </div>
 </div>
@@ -139,8 +177,8 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 
   <div class="briefing">
     <h2>📅 Today's Briefing</h2>
-    <div style="font-size:22px;font-weight:700" id="today-disp"></div>
-    <div style="font-size:13px;color:#c0c8e0" id="dow"></div>
+    <div style="font-size:20px;font-weight:700" id="today-disp"></div>
+    <div style="font-size:12px;color:#c0c8e0" id="dow"></div>
     <div class="briefing-grid">
       <div class="b-item"><div class="lbl">Next PDC Due</div><div class="val" id="next-days">—</div><div class="sub" id="next-label">—</div></div>
       <div class="b-item"><div class="lbl">Next PDC Amount</div><div class="val" id="next-amt">—</div><div class="sub" id="next-vendors">—</div></div>
@@ -151,11 +189,11 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
   <div id="alerts"></div>
 
   <div class="totals">
-    <div class="t-pill danger"><div class="tl">A — Bank PDCs</div><div class="tv" id="pdc-total">—</div><div class="ts" id="pdc-count">—</div></div>
-    <div class="t-pill warning"><div class="tl">B — Urgent Demands</div><div class="tv" id="dem-total">—</div><div class="ts" id="dem-count">—</div></div>
-    <div class="t-pill info"><div class="tl">C — Cash Vendors</div><div class="tv" id="cash-total">—</div><div class="ts" id="cash-count">—</div></div>
-    <div class="t-pill purple"><div class="tl">D — Upcoming Expenses</div><div class="tv" id="exp-total">—</div><div class="ts" id="exp-count">—</div></div>
-    <div class="t-pill teal"><div class="tl">E — Pending Refunds</div><div class="tv" id="ref-total">—</div><div class="ts" id="ref-count">—</div></div>
+    <div class="t-pill danger"><div class="tl">Bank PDCs</div><div class="tv" id="pdc-total">—</div><div class="ts" id="pdc-count">—</div></div>
+    <div class="t-pill warning"><div class="tl">Vendor Demands</div><div class="tv" id="dem-total">—</div><div class="ts" id="dem-count">—</div></div>
+    <div class="t-pill info"><div class="tl">Cash Vendors</div><div class="tv" id="cash-total">—</div><div class="ts" id="cash-count">—</div></div>
+    <div class="t-pill purple"><div class="tl">Upcoming Expenses</div><div class="tv" id="exp-total">—</div><div class="ts" id="exp-count">—</div></div>
+    <div class="t-pill teal"><div class="tl">Pending Refunds</div><div class="tv" id="ref-total">—</div><div class="ts" id="ref-count">—</div></div>
   </div>
 
   <div class="grid-2">
@@ -167,62 +205,75 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
         <div class="calc-res" id="calc-res"><div class="rl">Select a payment date above</div><div class="rv" style="color:#ccc">PKR —</div></div>
       </div>
 
+      <!-- Team Notes — collapsible per-user read tracking -->
       <div class="card">
-        <div class="card-header"><span style="font-size:20px">📝</span><h2>Today's Team Notes</h2></div>
-        <div class="notes-box notes-empty" id="notes-display">No notes added yet for today.</div>
+        <div class="card-header">
+          <span style="font-size:20px">📝</span>
+          <h2>Team Notes</h2>
+          <span id="unread-count-badge" style="display:none;background:#e74c3c;color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700"></span>
+          <a href="/entry" style="font-size:11px;color:#3a3a7c;text-decoration:none;font-weight:600;margin-left:4px">+ Add Note</a>
+        </div>
+        <div id="notes-container"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
       </div>
 
       <div class="card">
-        <div class="card-header"><span style="font-size:20px">📋</span><h2>Daily SOP — Morning Routine</h2></div>
-        <div class="sop-step"><div class="sop-n">1</div><div class="sop-c"><strong>Check Bank Balance (5 min)</strong><span>Enter today's bank balance in the Cash Gap Calculator above.</span></div></div>
-        <div class="sop-step"><div class="sop-n">2</div><div class="sop-c"><strong>Review 7-Day PDCs (2 min)</strong><span>Red badge = needs funds NOW. Calculate your daily collection target.</span></div></div>
-        <div class="sop-step"><div class="sop-n">3</div><div class="sop-c"><strong>Check Team Notes</strong><span>Read what team logged — collections, vendor agreements, issues.</span></div></div>
-        <div class="sop-step"><div class="sop-n">4</div><div class="sop-c"><strong>Handle Vendor Demands + Expenses</strong><span>Team updates statuses. Review upcoming expenses — mark Done once paid.</span></div></div>
-        <div class="sop-step"><div class="sop-n">5</div><div class="sop-c"><strong>Process Pending Refunds</strong><span>Check Refunds section. Mark as Paid once money is sent to customer.</span></div></div>
+        <div class="card-header"><span style="font-size:20px">📋</span><h2>Morning SOP</h2></div>
+        <div class="sop-step"><div class="sop-n">1</div><div class="sop-c"><strong>Check Bank Balance</strong><span>Enter today's balance in the Cash Gap Calculator.</span></div></div>
+        <div class="sop-step"><div class="sop-n">2</div><div class="sop-c"><strong>Review 7-Day PDCs</strong><span>Red badge = needs funds NOW. Calculate daily collection target.</span></div></div>
+        <div class="sop-step"><div class="sop-n">3</div><div class="sop-c"><strong>Read Team Notes</strong><span>Mark each note as read after reviewing.</span></div></div>
+        <div class="sop-step"><div class="sop-n">4</div><div class="sop-c"><strong>Vendor Demands + Expenses</strong><span>Update statuses. Mark expenses as Done once paid.</span></div></div>
+        <div class="sop-step"><div class="sop-n">5</div><div class="sop-c"><strong>Process Refunds</strong><span>Mark Paid once money is sent to customer.</span></div></div>
       </div>
     </div>
 
     <div>
       <div class="card">
-        <div class="card-header"><span style="font-size:20px">🏦</span><h2>Category A — PDC Timeline</h2></div>
-        <div style="font-size:11px;color:#888;margin-bottom:12px">Bank will debit on these exact dates. Non-negotiable.</div>
+        <div class="card-header"><span style="font-size:20px">🏦</span><h2>PDC Payment Timeline</h2></div>
+        <div style="font-size:11px;color:#888;margin-bottom:12px">Bank debits on these exact dates. Non-negotiable.</div>
         <div id="pdc-timeline"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
       </div>
     </div>
   </div>
 
+  <!-- Vendor Demands -->
   <div class="card">
-    <div class="card-header"><span style="font-size:20px">🔥</span><h2>Category B — Urgent Vendor Demands</h2></div>
-    <div style="font-size:11px;color:#888;margin-bottom:10px">Updated by team in real-time.</div>
+    <div class="card-header"><span style="font-size:20px">🔥</span><h2>Vendor Demands</h2></div>
     <div style="display:grid;grid-template-columns:1fr 110px 80px 80px;gap:6px;padding:6px 0;font-size:11px;font-weight:700;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">
       <span>Vendor</span><span style="text-align:right">Amount</span><span style="text-align:center">Priority</span><span style="text-align:center">Status</span>
     </div>
     <div id="demand-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
-    <div style="margin-top:12px;padding:10px;background:#fffbf0;border-radius:8px;font-size:12px;border-left:3px solid #ffd166" id="neg-tip"></div>
+    <div style="margin-top:12px;padding:12px 14px;background:#f8f8ff;border-radius:8px;font-size:13px;border-left:3px solid #3a3a7c;line-height:1.7" id="neg-tip"></div>
   </div>
 
+  <!-- Cash Vendors -->
   <div class="card">
-    <div class="card-header"><span style="font-size:20px">💵</span><h2>Category C — Cash Vendors</h2></div>
+    <div class="card-header"><span style="font-size:20px">💵</span><h2>Cash Vendors</h2></div>
     <div id="cash-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
   </div>
 
+  <!-- Upcoming Expenses -->
   <div class="card">
-    <div class="card-header"><span style="font-size:20px">📌</span><h2>Category D — Upcoming / Required Expenses</h2>
-      <span style="font-size:11px;color:#888;margin-left:auto">Pending items included in liability</span>
+    <div class="card-header">
+      <span style="font-size:20px">📌</span><h2>Upcoming / Required Expenses</h2>
+      <span style="font-size:11px;color:#888">Pending included in liability</span>
     </div>
     <div id="exp-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
   </div>
 
+  <!-- Refunds -->
   <div class="card">
-    <div class="card-header"><span style="font-size:20px">↩️</span><h2>Category E — Pending Customer Refunds</h2>
-      <span style="font-size:11px;color:#888;margin-left:auto">Pending refunds included in liability</span>
+    <div class="card-header">
+      <span style="font-size:20px">↩️</span><h2>Pending Customer Refunds</h2>
+      <span style="font-size:11px;color:#888">Pending included in liability</span>
     </div>
     <div id="ref-list"><div style="color:#aaa;text-align:center;padding:20px">Loading…</div></div>
   </div>
 
+  <!-- Cleared PDCs (archive) -->
   <div class="card" id="paid-card" style="display:none">
-    <div class="card-header"><span style="font-size:20px">✅</span><h2>Cleared PDC Cheques — Paid &amp; Debited</h2>
-      <span style="font-size:11px;color:#888;margin-left:auto">Removed from liabilities · Record only</span>
+    <div class="card-header">
+      <span style="font-size:20px">✅</span><h2>Cleared PDC Cheques</h2>
+      <span style="font-size:11px;color:#888;margin-left:auto">Paid &amp; debited — record only</span>
     </div>
     <div id="paid-list"></div>
   </div>
@@ -230,7 +281,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #
 </div>
 
 <script>
-let PDC=[], DEMANDS=[], PAID=[], selectedIdx=0;
+let PDC=[], DEMANDS=[], PAID=[], selectedIdx=0, currentUser=null;
 
 const fmt = n => 'PKR ' + parseFloat(n||0).toLocaleString('en-PK');
 const daysUntil = iso => { const t=new Date(); t.setHours(0,0,0,0); const d=new Date(iso+'T00:00:00'); return Math.ceil((d-t)/86400000); };
@@ -243,6 +294,19 @@ const urgBadge = d => {
   if(d<=14) return {c:'b-yellow',t:d+' days'};
   return          {c:'b-green',  t:d+' days'};
 };
+
+async function init() {
+  const me = await fetch('/auth/me').then(r=>r.json()).catch(()=>({loggedIn:false}));
+  if (!me.loggedIn) { window.location.href='/login'; return; }
+  currentUser = me;
+  document.getElementById('user-label').textContent = `👤 ${me.username}`;
+  // Load version for topbar sub
+  fetch('/api/version').then(r=>r.json()).then(v => {
+    document.getElementById('top-domain').textContent = `${v.appName} · v${v.version} · Auto-refreshes`;
+  }).catch(()=>{});
+  loadData();
+  setInterval(loadData, 30000);
+}
 
 async function loadData() {
   try {
@@ -276,7 +340,7 @@ function renderAll(d) {
   renderExpenses(d.pendingExpenses||[]);
   renderRefunds(d.pendingRefunds||[]);
   renderPaidCheques(d.paidCheques||[]);
-  renderNotes(d.notes||'');
+  renderNotes(d.noteEntries||[]);
 }
 
 function renderBriefing() {
@@ -301,7 +365,7 @@ function renderBriefing() {
 function renderAlerts() {
   let html='';
   PDC.forEach(p=>{ const d=daysUntil(p.isoDate);
-    if(d>=0&&d<=7)    html+=`<div class="alert a-red"><span style="font-size:18px">🚨</span><div><strong>${p.label} — ${fmt(p.total)} DUE IN ${d} DAY${d!==1?'S':''}</strong> Vendors: ${p.cheques.map(c=>c.vendor).join(', ')}</div></div>`;
+    if(d>=0&&d<=7)    html+=`<div class="alert a-red"><span style="font-size:18px">🚨</span><div><strong>${p.label} — ${fmt(p.total)} DUE IN ${d} DAY${d!==1?'S':''}</strong> ${p.cheques.map(c=>c.vendor).join(', ')}</div></div>`;
     else if(d>7&&d<=14) html+=`<div class="alert a-orange"><span style="font-size:18px">⚠️</span><div><strong>${p.label} — ${fmt(p.total)} in ${d} days</strong> Start collecting: ${p.cheques.map(c=>c.vendor).join(', ')}</div></div>`;
   });
   if(!html){ const n=PDC.filter(p=>daysUntil(p.isoDate)>=0)[0]; html=`<div class="alert a-green"><span>✅</span><div><strong>No PDC deadlines this week.</strong> Next: ${n?.label||'None'}</div></div>`; }
@@ -309,35 +373,33 @@ function renderAlerts() {
 }
 
 function renderTotals(d) {
-  const pdcAmt   = PDC.reduce((s,p)=>s+p.total,0);
-  const pdcCnt   = PDC.reduce((s,p)=>s+p.cheques.length,0);
-  const demAmt   = DEMANDS.reduce((s,x)=>s+x.amount,0);
-  const cashAmt  = (d.cashVendors||[]).reduce((s,x)=>s+x.amount,0);
-  const expAmt   = (d.pendingExpenses||[]).reduce((s,x)=>s+x.amount,0);
-  const refAmt   = (d.pendingRefunds||[]).reduce((s,x)=>s+x.amount,0);
-  const grand    = pdcAmt + demAmt + cashAmt + expAmt + refAmt;
-
+  const pdcAmt  = PDC.reduce((s,p)=>s+p.total,0);
+  const pdcCnt  = PDC.reduce((s,p)=>s+p.cheques.length,0);
+  const demAmt  = DEMANDS.reduce((s,x)=>s+x.amount,0);
+  const cashAmt = (d.cashVendors||[]).reduce((s,x)=>s+x.amount,0);
+  const expAmt  = (d.pendingExpenses||[]).reduce((s,x)=>s+x.amount,0);
+  const refAmt  = (d.pendingRefunds||[]).reduce((s,x)=>s+x.amount,0);
+  const grand   = pdcAmt+demAmt+cashAmt+expAmt+refAmt;
   document.getElementById('total-label').textContent = fmt(grand);
-  document.getElementById('pdc-total').textContent  = fmt(pdcAmt);
-  document.getElementById('pdc-count').textContent  = `${pdcCnt} cheques`;
-  document.getElementById('dem-total').textContent  = fmt(demAmt);
-  document.getElementById('dem-count').textContent  = `${DEMANDS.length} vendors`;
-  document.getElementById('cash-total').textContent = fmt(cashAmt);
-  document.getElementById('cash-count').textContent = `${(d.cashVendors||[]).length} entries`;
-  document.getElementById('exp-total').textContent  = fmt(expAmt);
-  document.getElementById('exp-count').textContent  = `${(d.pendingExpenses||[]).length} pending`;
-  document.getElementById('ref-total').textContent  = fmt(refAmt);
-  document.getElementById('ref-count').textContent  = `${(d.pendingRefunds||[]).length} pending`;
+  document.getElementById('pdc-total').textContent   = fmt(pdcAmt);
+  document.getElementById('pdc-count').textContent   = `${pdcCnt} cheques`;
+  document.getElementById('dem-total').textContent   = fmt(demAmt);
+  document.getElementById('dem-count').textContent   = `${DEMANDS.length} vendors`;
+  document.getElementById('cash-total').textContent  = fmt(cashAmt);
+  document.getElementById('cash-count').textContent  = `${(d.cashVendors||[]).length} entries`;
+  document.getElementById('exp-total').textContent   = fmt(expAmt);
+  document.getElementById('exp-count').textContent   = `${(d.pendingExpenses||[]).length} pending`;
+  document.getElementById('ref-total').textContent   = fmt(refAmt);
+  document.getElementById('ref-count').textContent   = `${(d.pendingRefunds||[]).length} pending`;
 }
 
 function renderTimeline() {
-  if(!PDC.length){ document.getElementById('pdc-timeline').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No cheques. Add from Data Entry panel.</div>'; return; }
+  if(!PDC.length){ document.getElementById('pdc-timeline').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No cheques. Add from Data Entry.</div>'; return; }
   const maxA=Math.max(...PDC.map(p=>p.total)); let html='';
   PDC.forEach((p,i)=>{
-    const d=daysUntil(p.isoDate); const col=urgColor(d); const b=urgBadge(d);
-    const bw=Math.round(p.total/maxA*100); const passed=d<0;
-    html+=`<div class="pdc-row" style="opacity:${passed?.45:1}">
-      <div class="pdc-badge"><div class="dc" style="color:${col}">${passed?'✓':(d===0?'⚡':d)}</div><div class="dl">${passed?'cleared':(d===0?'DUE NOW':'days left')}</div><div class="ds">${p.label}</div></div>
+    const d=daysUntil(p.isoDate); const col=urgColor(d); const b=urgBadge(d); const bw=Math.round(p.total/maxA*100);
+    html+=`<div class="pdc-row" style="opacity:${d<0?.45:1}">
+      <div class="pdc-badge"><div class="dc" style="color:${col}">${d<0?'✓':(d===0?'⚡':d)}</div><div class="dl">${d<0?'cleared':(d===0?'DUE NOW':'days left')}</div><div class="ds">${p.label}</div></div>
       <div style="flex:1">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px"><span class="badge ${b.c}">${b.t}</span>${p.cheques.map(c=>`<span class="vc">${c.vendor}</span>`).join('')}</div>
         <div class="bar-wrap"><div class="bar-fill" style="width:${bw}%;background:${col}"></div></div>
@@ -352,7 +414,7 @@ function renderTimeline() {
 
 function renderWeekSel() {
   const up=PDC.filter(p=>daysUntil(p.isoDate)>=0); let html='';
-  up.forEach((p,i)=>{
+  up.forEach(p=>{
     const gi=PDC.indexOf(p);
     html+=`<button class="wbtn ${gi===selectedIdx?'active':''}" onclick="selWeek(${gi})">${p.label}<br><span style="font-size:10px;font-weight:400">${fmt(p.total)}</span></button>`;
   });
@@ -376,65 +438,98 @@ function calcGap(){
 }
 
 function renderDemands() {
-  const sc={Urgent:'b-red',Negotiated:'b-blue',Deferred:'b-yellow',Corrected:'b-blue',Paid:'b-green'};
+  const sc={Urgent:'b-red',Negotiated:'b-green',Deferred:'b-yellow',Corrected:'b-blue',Paid:'b-green'};
   const pc={High:'b-red',Medium:'b-orange',Low:'b-gray'};
-  if(!DEMANDS.length){ document.getElementById('demand-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No demands. Add from Data Entry.</div>'; return; }
+  if(!DEMANDS.length){ document.getElementById('demand-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No demands.</div>'; document.getElementById('neg-tip').innerHTML=''; return; }
   let html='';
   DEMANDS.forEach(d=>{
     html+=`<div class="dem-row">
       <div style="flex:1;font-weight:600">${d.vendor}</div>
       <div style="font-weight:700;color:#e74c3c;min-width:110px;text-align:right">PKR ${d.amount.toLocaleString()}</div>
-      <div style="text-align:center"><span class="badge ${pc[d.priority]||'b-gray'}">${d.priority}</span></div>
-      <div style="text-align:center"><span class="badge ${sc[d.status]||'b-gray'}">${d.status}</span></div>
+      <div style="text-align:center;min-width:70px"><span class="badge ${pc[d.priority]||'b-gray'}">${d.priority}</span></div>
+      <div style="text-align:center;min-width:80px"><span class="badge ${sc[d.status]||'b-gray'}">${d.status}</span></div>
     </div>`;
   });
   document.getElementById('demand-list').innerHTML=html;
-  const high=DEMANDS.filter(d=>d.priority==='High');
-  if(high.length){
-    const total=high.reduce((s,d)=>s+d.amount,0);
-    document.getElementById('neg-tip').innerHTML=`<strong style="display:block;margin-bottom:4px">💡 Negotiation Tip</strong>${high.map(d=>d.vendor).join(' + ')} = ${fmt(total)}. Offer 20% now (≈${fmt(Math.round(total*.2))}) to buy 2 weeks.`;
-  } else { document.getElementById('neg-tip').innerHTML=''; }
+  document.getElementById('neg-tip').innerHTML = buildNegotiationTip(DEMANDS);
+}
+
+function buildNegotiationTip(demands) {
+  const active = demands.filter(d => d.status !== 'Paid' && d.status !== 'Corrected');
+  if (!active.length) return '';
+
+  const urgent     = active.filter(d => d.status === 'Urgent').sort((a,b)=>b.amount-a.amount);
+  const negotiated = active.filter(d => d.status === 'Negotiated');
+  const deferred   = active.filter(d => d.status === 'Deferred');
+  const high       = active.filter(d => d.priority === 'High');
+
+  let lines = [];
+
+  if (urgent.length === 0 && high.length === 0) {
+    lines.push('✅ All active vendors are in a managed state. No immediate action required.');
+  } else {
+    // Lead vendor — highest amount among urgent/high
+    const lead = [...urgent, ...high.filter(d=>d.status==='Urgent')].sort((a,b)=>b.amount-a.amount)[0];
+    if (lead) {
+      const partial = Math.round(lead.amount * 0.3);
+      const instalment = Math.round(lead.amount * 0.25);
+      lines.push(`🎯 <strong>Lead with ${lead.vendor} (PKR ${lead.amount.toLocaleString()})</strong> — they have the highest outstanding. Call today and offer PKR ${partial.toLocaleString()} (30%) as immediate partial, then propose 2 equal instalments of PKR ${instalment.toLocaleString()} over the next 2 weeks. Written commitment works better than a verbal promise.`);
+    }
+
+    // Remaining urgent vendors
+    const others = urgent.filter(d => d !== lead);
+    if (others.length) {
+      const otherTotal = others.reduce((s,d)=>s+d.amount,0);
+      lines.push(`📞 <strong>${others.map(d=>d.vendor).join(', ')}</strong> — also urgent (PKR ${otherTotal.toLocaleString()} total). Sequence calls: highest amount first. Offer post-dated schedule, not open-ended promises.`);
+    }
+
+    // High priority not yet urgent
+    const highPending = high.filter(d => d.status !== 'Urgent' && d.status !== 'Paid');
+    if (highPending.length) {
+      lines.push(`⚠️ <strong>${highPending.map(d=>d.vendor).join(' + ')}</strong> are High priority — proactively reach out before they escalate to Urgent status.`);
+    }
+  }
+
+  if (negotiated.length) {
+    lines.push(`📋 <strong>${negotiated.map(d=>d.vendor).join(', ')}</strong> — already negotiated. Follow up to confirm committed payment dates are on track.`);
+  }
+  if (deferred.length) {
+    const defTotal = deferred.reduce((s,d)=>s+d.amount,0);
+    lines.push(`⏸ <strong>${deferred.map(d=>d.vendor).join(', ')}</strong> deferred (PKR ${defTotal.toLocaleString()}) — re-confirm deferral dates so they don't revert to Urgent.`);
+  }
+
+  return lines.map((l,i) => `<div style="${i>0?'margin-top:10px;padding-top:10px;border-top:1px solid #e8e8f8;':''}">${l}</div>`).join('');
 }
 
 function renderCashVendors(cash) {
   if(!cash.length){ document.getElementById('cash-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No cash vendor entries.</div>'; return; }
-  let html='', total=0;
+  let html='',total=0;
   cash.forEach(h=>{ total+=h.amount;
-    html+=`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:13px"><div style="flex:1;font-weight:600">${h.vendor}</div><div style="color:#888;min-width:90px">${h.date||'—'}</div><div style="font-weight:700;color:#e67e22">PKR ${h.amount.toLocaleString()}</div></div>`;
+    html+=`<div class="row-line"><div style="flex:1;font-weight:600">${h.vendor}</div><div style="color:#888;min-width:90px">${h.date||'—'}</div><div style="font-weight:700;color:#e67e22">PKR ${h.amount.toLocaleString()}</div></div>`;
   });
-  html+=`<div style="display:flex;gap:10px;padding:8px 0;font-size:13px;border-top:2px solid #eee;margin-top:4px"><div style="flex:1;font-weight:700">TOTAL</div><div style="min-width:90px"></div><div style="font-weight:700">PKR ${total.toLocaleString()}</div></div>`;
+  html+=`<div style="display:flex;justify-content:flex-end;padding:8px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px">Total: PKR ${total.toLocaleString()}</div>`;
   document.getElementById('cash-list').innerHTML=html;
 }
 
 function renderExpenses(expenses) {
   if(!expenses.length){ document.getElementById('exp-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No pending expenses.</div>'; return; }
-  const catColors = {Salary:'b-red',Rent:'b-orange',Utility:'b-blue',Supplier:'b-yellow',Tax:'b-purple',General:'b-gray'};
-  let html='', total=0;
+  const cc={Salary:'b-red',Rent:'b-orange',Utility:'b-blue',Supplier:'b-yellow',Tax:'b-purple',General:'b-gray'};
+  let html='',total=0;
   expenses.forEach(e=>{ total+=e.amount;
-    const dueStr = e.due_date ? new Date(e.due_date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-    html+=`<div style="display:grid;grid-template-columns:1fr 80px 100px 130px;gap:8px;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:13px;align-items:center">
-      <div style="font-weight:600">${e.description}</div>
-      <div><span class="badge ${catColors[e.category]||'b-gray'}">${e.category}</span></div>
-      <div style="color:#888;font-size:12px">Due: ${dueStr}</div>
-      <div style="font-weight:700;color:#8e44ad;text-align:right">PKR ${e.amount.toLocaleString()}</div>
-    </div>`;
+    const dueStr=e.due_date?new Date(e.due_date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—';
+    html+=`<div class="row-line"><div style="flex:1;font-weight:600">${e.description}</div><span class="badge ${cc[e.category]||'b-gray'}">${e.category}</span><div style="color:#888;font-size:12px;min-width:80px;text-align:right">${dueStr}</div><div style="font-weight:700;color:#8e44ad;min-width:110px;text-align:right">PKR ${e.amount.toLocaleString()}</div></div>`;
   });
-  html+=`<div style="display:flex;justify-content:flex-end;padding:10px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#8e44ad">Total Pending: PKR ${total.toLocaleString()}</div>`;
+  html+=`<div style="display:flex;justify-content:flex-end;padding:8px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#8e44ad">Total Pending: PKR ${total.toLocaleString()}</div>`;
   document.getElementById('exp-list').innerHTML=html;
 }
 
 function renderRefunds(refunds) {
   if(!refunds.length){ document.getElementById('ref-list').innerHTML='<div style="color:#aaa;text-align:center;padding:20px">No pending refunds.</div>'; return; }
-  let html='', total=0;
+  let html='',total=0;
   refunds.forEach(r=>{ total+=r.amount;
-    html+=`<div style="display:grid;grid-template-columns:130px 130px 1fr 140px;gap:8px;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:13px;align-items:center">
-      <div style="font-family:monospace;font-size:12px">${r.order_number||'—'}</div>
-      <div style="font-size:12px;color:#666">${r.customer_phone||'—'}</div>
-      <div style="font-size:12px;color:#555">${r.notes?r.notes.slice(0,40)+(r.notes.length>40?'…':''):'—'}</div>
-      <div style="font-weight:700;color:#16a085;text-align:right">PKR ${r.amount.toLocaleString()}</div>
-    </div>`;
+    html+=`<div class="row-line"><div style="font-family:monospace;font-size:12px;min-width:110px">${r.order_number||'—'}</div><div style="font-size:12px;color:#666;min-width:110px">${r.customer_phone||'—'}</div><div style="flex:1;font-size:12px;color:#555">${r.notes?r.notes.slice(0,40)+(r.notes.length>40?'…':''):'—'}</div><div style="font-weight:700;color:#16a085;min-width:110px;text-align:right">PKR ${r.amount.toLocaleString()}</div></div>`;
   });
-  html+=`<div style="display:flex;justify-content:flex-end;padding:10px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#16a085">Total Pending: PKR ${total.toLocaleString()}</div>`;
+  html+=`<div style="display:flex;justify-content:flex-end;padding:8px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#16a085">Total Pending: PKR ${total.toLocaleString()}</div>`;
   document.getElementById('ref-list').innerHTML=html;
 }
 
@@ -442,45 +537,113 @@ function renderPaidCheques(paid) {
   const card=document.getElementById('paid-card');
   if(!paid.length){ card.style.display='none'; return; }
   card.style.display='';
-  let html='', total=0;
+  let html='',total=0;
   paid.forEach(c=>{ total+=c.amount;
-    const paidOn = c.paid_at ? new Date(c.paid_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-    const chqDate = new Date(c.date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-    html+=`<div style="display:grid;grid-template-columns:1fr 100px 100px 120px;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;align-items:center">
-      <div style="font-weight:600;color:#444">${c.vendor} <span style="font-size:10px;color:#aaa;font-family:monospace">${c.cheque_no||''}</span></div>
-      <div style="color:#888;font-size:12px">Due: ${chqDate}</div>
-      <div style="color:#888;font-size:12px">Cleared: ${paidOn}</div>
-      <div style="font-weight:700;color:#27ae60;text-align:right">PKR ${c.amount.toLocaleString()}</div>
-    </div>`;
+    const paidOn=c.paid_at?new Date(c.paid_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—';
+    const chqDate=new Date(c.date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    html+=`<div class="row-line"><div style="flex:1;font-weight:600">${c.vendor} <span style="font-size:10px;color:#aaa;font-family:monospace">${c.cheque_no||''}</span></div><div style="color:#888;font-size:12px">Due: ${chqDate}</div><div style="color:#888;font-size:12px;margin-left:12px">Cleared: ${paidOn}</div><div style="font-weight:700;color:#27ae60;min-width:120px;text-align:right">PKR ${c.amount.toLocaleString()}</div></div>`;
   });
-  html+=`<div style="display:flex;justify-content:flex-end;padding:10px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#27ae60">Total Cleared: PKR ${total.toLocaleString()}</div>`;
+  html+=`<div style="display:flex;justify-content:flex-end;padding:8px 0 0;font-size:13px;font-weight:700;border-top:2px solid #eee;margin-top:4px;color:#27ae60">Total Cleared: PKR ${total.toLocaleString()}</div>`;
   document.getElementById('paid-list').innerHTML=html;
 }
 
-function renderNotes(notes) {
-  const el=document.getElementById('notes-display');
-  if(notes&&notes.trim()){ el.textContent=notes; el.classList.remove('notes-empty'); }
-  else { el.textContent='No notes added yet for today. Team can add notes in the Data Entry panel.'; el.classList.add('notes-empty'); }
+// ── Notes with collapsible cards and per-user mark-as-read ──
+function renderNotes(entries) {
+  const container = document.getElementById('notes-container');
+  const badge     = document.getElementById('unread-count-badge');
+  if (!currentUser) return;
+
+  const storageKey = `read_notes_${currentUser.username}`;
+  let readSet = new Set(JSON.parse(localStorage.getItem(storageKey)||'[]'));
+
+  // Sync: if server says is_read for this user, add to local set too
+  entries.forEach(n => { if (n.is_read) readSet.add(n.id); });
+
+  const unread = entries.filter(n => !readSet.has(n.id));
+  if (unread.length > 0) {
+    badge.textContent = `${unread.length} unread`;
+    badge.style.display = 'inline';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  if (!entries.length) {
+    container.innerHTML = '<div style="color:#aaa;text-align:center;padding:20px;font-size:13px">No notes yet. Team can add notes from the Data Entry panel.</div>';
+    return;
+  }
+
+  const allRead = unread.length === 0;
+  if (allRead && entries.length > 0) {
+    // Show a clean "all read" state with collapsed list
+    container.innerHTML = `
+      <div class="note-all-read">✅ You've read all notes. <button onclick="showAllNotes()" style="background:none;border:none;color:#3a3a7c;font-size:13px;font-weight:600;cursor:pointer;text-decoration:underline">Show anyway</button></div>
+      <div id="all-notes-hidden" style="display:none">${buildNoteCards(entries, readSet)}</div>`;
+    return;
+  }
+
+  container.innerHTML = buildNoteCards(entries, readSet);
+}
+
+function buildNoteCards(entries, readSet) {
+  return entries.map(n => {
+    const isRead  = readSet.has(n.id);
+    const hasBody = n.body && n.body.trim();
+    const dt      = new Date(n.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    return `<div class="note-card ${isRead?'read':'unread'}" id="dnc-${n.id}">
+      <div class="note-card-header" onclick="toggleNoteCard(${n.id},${hasBody?1:0})">
+        <div class="note-dot ${isRead?'dot-read':'dot-new'}"></div>
+        <div class="note-card-title">${n.title}</div>
+        <span class="badge ${isRead?'b-gray':'b-orange'}" style="font-size:9px">${isRead?'Read':'New'}</span>
+        ${hasBody?'<span style="font-size:12px;color:#aaa;margin-left:4px">▼</span>':''}
+      </div>
+      <div class="note-card-meta">By ${n.created_by||'Team'} · ${dt}</div>
+      ${hasBody?`<div class="note-card-body collapsed" id="dnb-${n.id}">${n.body.replace(/\n/g,'<br>')}</div>`:''}
+      ${!isRead?`<div class="note-card-actions"><button class="note-mark-btn" onclick="markDashNoteRead(${n.id})">✓ Mark as Read</button></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleNoteCard(id, hasBody) {
+  if (!hasBody) return;
+  const body = document.getElementById(`dnb-${id}`);
+  if (!body) return;
+  body.classList.toggle('collapsed');
+  const arrow = document.querySelector(`#dnc-${id} .note-card-header span[style*="color:#aaa"]`);
+  if (arrow) arrow.textContent = body.classList.contains('collapsed') ? '▼' : '▲';
+}
+
+async function markDashNoteRead(id) {
+  // Server-side mark
+  await fetch(`/api/note-entries/${id}/read`, {method:'POST'}).catch(()=>{});
+  // Local storage mark
+  if (!currentUser) return;
+  const storageKey = `read_notes_${currentUser.username}`;
+  let readSet = new Set(JSON.parse(localStorage.getItem(storageKey)||'[]'));
+  readSet.add(id);
+  localStorage.setItem(storageKey, JSON.stringify([...readSet]));
+  // Animate removal
+  const card = document.getElementById(`dnc-${id}`);
+  if (card) {
+    card.style.transition = 'opacity .4s, max-height .4s';
+    card.style.opacity = '0';
+    setTimeout(() => loadData(), 450);
+  }
+}
+
+function showAllNotes() {
+  document.querySelector('#all-notes-hidden').style.display='block';
+  document.querySelector('.note-all-read').style.display='none';
 }
 
 function toggleD(id,btn){
   const el=document.getElementById(id);
-  if(el.classList.contains('collapsed')){ el.classList.remove('collapsed'); btn.textContent='▼ Hide details'; }
-  else { el.classList.add('collapsed'); btn.textContent='▶ Cheque details'; }
+  el.classList.toggle('collapsed');
+  btn.textContent=el.classList.contains('collapsed')?'▶ Cheque details':'▼ Hide details';
 }
 
 async function logout() {
   await fetch('/auth/logout',{method:'POST'});
   window.location.href='/login';
-}
-
-// Init — check auth and set username pill
-async function init() {
-  const me = await fetch('/auth/me').then(r=>r.json()).catch(()=>({loggedIn:false}));
-  if (!me.loggedIn) { window.location.href='/login'; return; }
-  document.getElementById('user-label').textContent = `👤 ${me.username}`;
-  loadData();
-  setInterval(loadData, 30000);
 }
 
 init();
