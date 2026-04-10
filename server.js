@@ -11,6 +11,14 @@ const PORT    = process.env.PORT || 3000;
 const SECRET  = process.env.SESSION_SECRET || 'vendordash-secret-change-this';
 const DB_PATH = process.env.DB_PATH || './data.db';
 
+// ── App version info (update these when releasing changes) ─
+const APP_VERSION = {
+  version: '2.2.0',
+  updated: '10 Apr 2026',
+  appName: 'apps.derma.pk',
+  developer: 'exitlogic.io'
+};
+
 // Uploads directory — co-located with DB so it lives on the persistent volume
 const UPLOADS_DIR = process.env.UPLOADS_DIR ||
   path.join(path.dirname(path.resolve(DB_PATH)), 'uploads');
@@ -88,6 +96,21 @@ db.exec(`
     created_at       TEXT DEFAULT (datetime('now','localtime'))
   );
 
+  CREATE TABLE IF NOT EXISTS note_entries (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    title      TEXT NOT NULL,
+    body       TEXT DEFAULT '',
+    created_by TEXT,
+    created_at TEXT DEFAULT (datetime('now','localtime'))
+  );
+
+  CREATE TABLE IF NOT EXISTS note_reads (
+    user_id       INTEGER NOT NULL,
+    note_entry_id INTEGER NOT NULL,
+    read_at       TEXT DEFAULT (datetime('now','localtime')),
+    PRIMARY KEY (user_id, note_entry_id)
+  );
+
   CREATE TABLE IF NOT EXISTS daily_notes (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     date       TEXT UNIQUE NOT NULL,
@@ -98,7 +121,6 @@ db.exec(`
 `);
 
 // ── Migrations ────────────────────────────────────────────
-// 1. Rename historical_unpaid → cash_vendors (one-time)
 try {
   const cols = db.prepare('PRAGMA table_info(historical_unpaid)').all();
   if (cols.length > 0) {
@@ -109,9 +131,7 @@ try {
     `);
     console.log('✅ Migrated historical_unpaid → cash_vendors');
   }
-} catch(e) { /* already migrated */ }
-
-// 2. Add paid_at column to pdc_cheques if upgrading
+} catch(e) {}
 try { db.exec('ALTER TABLE pdc_cheques ADD COLUMN paid_at TEXT'); } catch(e) {}
 
 // ── Seed default users ────────────────────────────────────
@@ -145,7 +165,6 @@ if (pdcCount.c === 0) {
     ['2026-05-12','DERMOLOGICS',   '10018934', 60476],
     ['2026-05-21','MAZTON',        '10018933', 41658],
   ].forEach(r => ins.run(...r));
-  console.log('✅ PDC cheques seeded');
 }
 
 const demCount = db.prepare('SELECT COUNT(*) as c FROM vendor_demands').get();
@@ -185,11 +204,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ['.jpg','.jpeg','.png','.gif','.webp','.pdf'];
     const ext = path.extname(file.originalname).toLowerCase();
-    allowed.includes(ext) ? cb(null, true) : cb(new Error('Only images (JPG/PNG/GIF/WebP) and PDF allowed'));
+    allowed.includes(ext) ? cb(null, true) : cb(new Error('Only images and PDF allowed'));
   }
 });
 
@@ -203,21 +222,25 @@ app.use(session({
   secret: SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 8 * 60 * 60 * 1000 } // 8 hours
+  cookie: { maxAge: 8 * 60 * 60 * 1000 }
 }));
 
-// Auth guards
 const requireAuth    = (req, res, next) => req.session?.userId ? next() : res.redirect('/login');
 const requireAuthAPI = (req, res, next) => req.session?.userId ? next() : res.status(401).json({ error: 'Not authenticated' });
 const requireAdmin   = (req, res, next) => req.session?.role === 'admin' ? next() : res.status(403).json({ error: 'Admin only' });
 
 // ─────────────────────────────────────────────────────────
-//  PAGE ROUTES — all require login
+//  PAGE ROUTES — all require login except /login itself
 // ─────────────────────────────────────────────────────────
-app.get('/',          (req, res) => res.redirect('/dashboard'));
+app.get('/',          requireAuth, (req, res) => res.sendFile(path.join(__dirname,'public','dashboard.html')));
 app.get('/login',     (req, res) => res.sendFile(path.join(__dirname,'public','login.html')));
 app.get('/dashboard', requireAuth, (req, res) => res.sendFile(path.join(__dirname,'public','dashboard.html')));
 app.get('/entry',     requireAuth, (req, res) => res.sendFile(path.join(__dirname,'public','entry.html')));
+
+// ─────────────────────────────────────────────────────────
+//  PUBLIC ROUTES
+// ─────────────────────────────────────────────────────────
+app.get('/api/version', (req, res) => res.json(APP_VERSION));
 
 // ─────────────────────────────────────────────────────────
 //  AUTH ROUTES
@@ -241,25 +264,22 @@ app.get('/auth/me', (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────
-//  DATA API — READ (now requires login — dashboard is protected)
+//  DATA API — READ
 // ─────────────────────────────────────────────────────────
 app.get('/api/data', requireAuthAPI, (req, res) => {
+  const userId     = req.session.userId;
   const allCheques = db.prepare('SELECT * FROM pdc_cheques ORDER BY date,id').all();
   const demands    = db.prepare('SELECT * FROM vendor_demands ORDER BY id').all();
   const cashVendors= db.prepare('SELECT * FROM cash_vendors ORDER BY id').all();
-  const todayNote  = db.prepare("SELECT * FROM daily_notes WHERE date=date('now','localtime')").get();
 
-  // Expenses: split pending vs paid
   const allExpenses     = db.prepare('SELECT * FROM upcoming_expenses ORDER BY due_date,id').all();
   const pendingExpenses = allExpenses.filter(e => e.status !== 'Paid');
   const paidExpenses    = allExpenses.filter(e => e.status === 'Paid');
 
-  // Refunds: split pending vs paid
   const allRefunds     = db.prepare('SELECT * FROM refunds ORDER BY created_at DESC').all();
   const pendingRefunds = allRefunds.filter(r => r.status !== 'Paid');
   const paidRefunds    = allRefunds.filter(r => r.status === 'Paid');
 
-  // PDC: pending only for liabilities; paid as archived record
   const pendingCheques = allCheques.filter(c => c.status !== 'Paid');
   const paidCheques    = allCheques.filter(c => c.status === 'Paid')
     .sort((a,b) => (b.paid_at||'').localeCompare(a.paid_at||''));
@@ -269,7 +289,6 @@ app.get('/api/data', requireAuthAPI, (req, res) => {
     if (!grouped[c.date]) grouped[c.date] = [];
     grouped[c.date].push(c);
   });
-
   const months = ['January','February','March','April','May','June',
                   'July','August','September','October','November','December'];
   const pdcSchedule = Object.entries(grouped).sort().map(([date, cqs]) => {
@@ -278,12 +297,21 @@ app.get('/api/data', requireAuthAPI, (req, res) => {
              total: cqs.reduce((s,c)=>s+c.amount,0), cheques: cqs };
   });
 
+  // Note entries — last 30 days — with per-user read status
+  const noteEntries = db.prepare(`
+    SELECT ne.*, CASE WHEN nr.user_id IS NOT NULL THEN 1 ELSE 0 END as is_read
+    FROM note_entries ne
+    LEFT JOIN note_reads nr ON nr.note_entry_id=ne.id AND nr.user_id=?
+    ORDER BY ne.created_at DESC
+    LIMIT 50
+  `).all(userId);
+
   res.json({
     pdcSchedule, paidCheques,
     demands, cashVendors,
     pendingExpenses, paidExpenses,
     pendingRefunds, paidRefunds,
-    notes: todayNote?.notes || '',
+    noteEntries,
     lastUpdated: new Date().toISOString()
   });
 });
@@ -292,7 +320,7 @@ app.get('/api/data', requireAuthAPI, (req, res) => {
 //  DATA API — WRITE
 // ─────────────────────────────────────────────────────────
 
-// ── A: PDC Cheques ────────────────────────────────────────
+// PDC Cheques
 app.get('/api/pdc', requireAuthAPI, (req,res) =>
   res.json(db.prepare('SELECT * FROM pdc_cheques ORDER BY date,id').all()));
 
@@ -312,20 +340,20 @@ app.delete('/api/pdc/:id', requireAuthAPI, (req,res) => {
 app.put('/api/pdc/:id/paid', requireAuthAPI, (req, res) => {
   const cheque = db.prepare('SELECT * FROM pdc_cheques WHERE id=?').get(req.params.id);
   if (!cheque) return res.status(404).json({ error: 'Cheque not found' });
-  if (cheque.status === 'Paid') return res.status(400).json({ error: 'Already marked as Paid' });
+  if (cheque.status === 'Paid') return res.status(400).json({ error: 'Already Paid' });
   const today = new Date(); today.setHours(0,0,0,0);
   const [y,m,d] = cheque.date.split('-').map(Number);
-  const chequeDate = new Date(y,m-1,d); chequeDate.setHours(0,0,0,0);
-  if (chequeDate > today) {
+  const cd = new Date(y,m-1,d); cd.setHours(0,0,0,0);
+  if (cd > today) {
     const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return res.status(403).json({ error:`🔒 Date lock: Cannot mark Paid before ${d} ${mn[m-1]} ${y}. Unlocks on cheque date.` });
+    return res.status(403).json({ error:`🔒 Date lock: Cannot mark Paid before ${d} ${mn[m-1]} ${y}.` });
   }
   db.prepare("UPDATE pdc_cheques SET status='Paid',paid_at=datetime('now','localtime'),created_by=? WHERE id=?")
     .run(req.session.username, req.params.id);
   res.json({ ok:true });
 });
 
-// ── B: Vendor Demands ─────────────────────────────────────
+// Vendor Demands
 app.get('/api/demands', requireAuthAPI, (req,res) =>
   res.json(db.prepare('SELECT * FROM vendor_demands ORDER BY id').all()));
 
@@ -349,7 +377,7 @@ app.delete('/api/demands/:id', requireAuthAPI, (req,res) => {
   res.json({ ok:true });
 });
 
-// ── C: Cash Vendors ───────────────────────────────────────
+// Cash Vendors
 app.get('/api/cash-vendors', requireAuthAPI, (req,res) =>
   res.json(db.prepare('SELECT * FROM cash_vendors ORDER BY id').all()));
 
@@ -366,7 +394,7 @@ app.delete('/api/cash-vendors/:id', requireAuthAPI, (req,res) => {
   res.json({ ok:true });
 });
 
-// ── D: Upcoming / Required Expenses ──────────────────────
+// Upcoming Expenses
 app.get('/api/expenses', requireAuthAPI, (req,res) =>
   res.json(db.prepare('SELECT * FROM upcoming_expenses ORDER BY due_date,id').all()));
 
@@ -379,8 +407,6 @@ app.post('/api/expenses', requireAuthAPI, (req,res) => {
 });
 
 app.put('/api/expenses/:id/paid', requireAuthAPI, (req,res) => {
-  const exp = db.prepare('SELECT * FROM upcoming_expenses WHERE id=?').get(req.params.id);
-  if (!exp) return res.status(404).json({ error:'Not found' });
   db.prepare("UPDATE upcoming_expenses SET status='Paid',paid_at=datetime('now','localtime'),created_by=? WHERE id=?")
     .run(req.session.username, req.params.id);
   res.json({ ok:true });
@@ -396,17 +422,12 @@ app.delete('/api/expenses/:id', requireAuthAPI, (req,res) => {
   res.json({ ok:true });
 });
 
-// ── E: Refunds ────────────────────────────────────────────
-// Report route MUST come before /:id routes
+// Refunds
 app.get('/api/refunds/report', requireAuthAPI, (req,res) => {
   const refunds = db.prepare('SELECT * FROM refunds ORDER BY created_at DESC').all();
-  const rows = [['ID','Order No','Customer Phone','Amount (PKR)','Status','Notes','Attachment','Added By','Date Added','Paid At']];
-  refunds.forEach(r => rows.push([
-    r.id, r.order_number||'', r.customer_phone||'', r.amount, r.status,
-    (r.notes||'').replace(/,/g,' '), r.attachment_name||'',
-    r.created_by||'', r.created_at||'', r.paid_at||''
-  ]));
-  const csv = rows.map(r => r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const rows = [['ID','Order No','Phone','Amount (PKR)','Status','Notes','Attachment','Added By','Date','Paid At']];
+  refunds.forEach(r => rows.push([r.id,r.order_number||'',r.customer_phone||'',r.amount,r.status,(r.notes||'').replace(/,/g,' '),r.attachment_name||'',r.created_by||'',r.created_at||'',r.paid_at||'']));
+  const csv = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   res.setHeader('Content-Type','text/csv');
   res.setHeader('Content-Disposition',`attachment; filename="refunds-${new Date().toISOString().slice(0,10)}.csv"`);
   res.send(csv);
@@ -417,16 +438,13 @@ app.get('/api/refunds', requireAuthAPI, (req,res) =>
 
 app.post('/api/refunds', requireAuthAPI, upload.single('attachment'), (req,res) => {
   const { order_number, customer_phone, amount, notes } = req.body;
-  if (!amount) return res.status(400).json({error:'Amount is required'});
+  if (!amount) return res.status(400).json({error:'Amount required'});
   const r = db.prepare('INSERT INTO refunds (order_number,customer_phone,amount,notes,attachment_path,attachment_name,created_by) VALUES (?,?,?,?,?,?,?)')
-    .run(order_number||'', customer_phone||'', parseFloat(amount), notes||'',
-         req.file?.filename||null, req.file?.originalname||null, req.session.username);
+    .run(order_number||'',customer_phone||'',parseFloat(amount),notes||'',req.file?.filename||null,req.file?.originalname||null,req.session.username);
   res.json({ ok:true, id:r.lastInsertRowid });
 });
 
 app.put('/api/refunds/:id/paid', requireAuthAPI, (req,res) => {
-  const ref = db.prepare('SELECT * FROM refunds WHERE id=?').get(req.params.id);
-  if (!ref) return res.status(404).json({ error:'Not found' });
   db.prepare("UPDATE refunds SET status='Paid',paid_at=datetime('now','localtime'),created_by=? WHERE id=?")
     .run(req.session.username, req.params.id);
   res.json({ ok:true });
@@ -439,9 +457,7 @@ app.put('/api/refunds/:id/pending', requireAuthAPI, (req,res) => {
 
 app.delete('/api/refunds/:id', requireAuthAPI, (req,res) => {
   const ref = db.prepare('SELECT * FROM refunds WHERE id=?').get(req.params.id);
-  if (ref?.attachment_path) {
-    try { fs.unlinkSync(path.join(UPLOADS_DIR, ref.attachment_path)); } catch(e) {}
-  }
+  if (ref?.attachment_path) try { fs.unlinkSync(path.join(UPLOADS_DIR, ref.attachment_path)); } catch(e) {}
   db.prepare('DELETE FROM refunds WHERE id=?').run(req.params.id);
   res.json({ ok:true });
 });
@@ -450,20 +466,50 @@ app.get('/api/refunds/:id/attachment', requireAuthAPI, (req,res) => {
   const ref = db.prepare('SELECT * FROM refunds WHERE id=?').get(req.params.id);
   if (!ref?.attachment_path) return res.status(404).json({ error:'No attachment' });
   const fp = path.join(UPLOADS_DIR, ref.attachment_path);
-  if (!fs.existsSync(fp)) return res.status(404).json({ error:'File not found on server' });
+  if (!fs.existsSync(fp)) return res.status(404).json({ error:'File not found' });
   res.download(fp, ref.attachment_name || ref.attachment_path);
 });
 
-// ── Notes ─────────────────────────────────────────────────
-app.post('/api/notes', requireAuthAPI, (req,res) => {
-  const { notes } = req.body;
-  const today = new Date().toISOString().slice(0,10);
-  db.prepare('INSERT INTO daily_notes (date,notes,updated_by) VALUES (?,?,?) ON CONFLICT(date) DO UPDATE SET notes=excluded.notes,updated_by=excluded.updated_by,updated_at=datetime("now")')
-    .run(today, notes||'', req.session.username);
+// Note Entries (new structured notes system)
+app.get('/api/note-entries', requireAuthAPI, (req,res) => {
+  const userId = req.session.userId;
+  const entries = db.prepare(`
+    SELECT ne.*, CASE WHEN nr.user_id IS NOT NULL THEN 1 ELSE 0 END as is_read
+    FROM note_entries ne
+    LEFT JOIN note_reads nr ON nr.note_entry_id=ne.id AND nr.user_id=?
+    ORDER BY ne.created_at DESC LIMIT 50
+  `).all(userId);
+  res.json(entries);
+});
+
+app.post('/api/note-entries', requireAuthAPI, (req,res) => {
+  const { title, body } = req.body;
+  if (!title?.trim()) return res.status(400).json({ error:'Title is required' });
+  const r = db.prepare('INSERT INTO note_entries (title,body,created_by) VALUES (?,?,?)')
+    .run(title.trim(), body||'', req.session.username);
+  res.json({ ok:true, id:r.lastInsertRowid });
+});
+
+app.delete('/api/note-entries/:id', requireAuthAPI, (req,res) => {
+  db.prepare('DELETE FROM note_reads WHERE note_entry_id=?').run(req.params.id);
+  db.prepare('DELETE FROM note_entries WHERE id=?').run(req.params.id);
   res.json({ ok:true });
 });
 
-// ── Users (admin only) ────────────────────────────────────
+app.post('/api/note-entries/:id/read', requireAuthAPI, (req,res) => {
+  const userId = req.session.userId;
+  db.prepare('INSERT OR REPLACE INTO note_reads (user_id, note_entry_id) VALUES (?,?)')
+    .run(userId, req.params.id);
+  res.json({ ok:true });
+});
+
+app.post('/api/note-entries/:id/unread', requireAuthAPI, (req,res) => {
+  db.prepare('DELETE FROM note_reads WHERE user_id=? AND note_entry_id=?')
+    .run(req.session.userId, req.params.id);
+  res.json({ ok:true });
+});
+
+// Users (admin only)
 app.get('/api/users', requireAuthAPI, requireAdmin, (req,res) =>
   res.json(db.prepare('SELECT id,username,role,created_at FROM users').all()));
 
@@ -487,7 +533,7 @@ app.put('/api/users/:id/password', requireAuthAPI, (req,res) => {
   if (req.session.role!=='admin' && req.session.userId!==parseInt(req.params.id))
     return res.status(403).json({error:'Not allowed'});
   const { password } = req.body;
-  if (!password||password.length<6) return res.status(400).json({error:'Password too short (min 6)'});
+  if (!password||password.length<6) return res.status(400).json({error:'Password too short'});
   db.prepare('UPDATE users SET password_hash=? WHERE id=?').run(bcrypt.hashSync(password,10),req.params.id);
   res.json({ ok:true });
 });
@@ -497,20 +543,12 @@ app.put('/api/users/:id/password', requireAuthAPI, (req,res) => {
 // ─────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`
-╔═══════════════════════════════════════════════╗
-║    VENDOR PAYMENT SYSTEM — RUNNING            ║
-╚═══════════════════════════════════════════════╝
-
-  Dashboard:    http://localhost:${PORT}/dashboard
-  Entry Panel:  http://localhost:${PORT}/entry
-  Login:        http://localhost:${PORT}/login
-
-  Default logins:
-    admin / admin123  (can manage users)
-    team  / team123   (data entry only)
-
-  ⚠️  Change passwords after first login!
-  🔒 Dashboard now requires login.
-  📁 Uploads stored at: ${UPLOADS_DIR}
+╔═══════════════════════════════════════════════════╗
+║    VENDOR PAYMENT SYSTEM v${APP_VERSION.version} — RUNNING       ║
+╚═══════════════════════════════════════════════════╝
+  Dashboard:  http://localhost:${PORT}/
+  Entry Panel: http://localhost:${PORT}/entry
+  Login:       http://localhost:${PORT}/login
+  Developer:   ${APP_VERSION.developer}
 `);
 });
